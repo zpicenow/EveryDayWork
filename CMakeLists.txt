@@ -3,4 +3,4 @@ project(EveryDayWork)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(EveryDayWork main.cpp)
+add_executable(EveryDayWork 100000568H.cpp sscanfTest.cpp)
