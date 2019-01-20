@@ -58,3 +58,17 @@ int main(){
 另外sscanf还支持正则表达式
 + 一维数组做参数不用写明长度，二维数组做参数要写明第二维长度
 +
+
+# 2019年01月20日打卡
++ 结构体不能定义自己，但是可以定义自身类型的指针变量
++ 结构体的指针类型用->代替(*p).
++ cin.getline(str,100)读入一整行赋值给字符数组str\[100]
++ getline(cin,str)读入一行赋值给字符串类型str
++ 浮点数比较相等，定义
+
+const double eps = 1e-8
+
+\#define Equ(a,b) ((fabs((a)-(b)))<(eps))
+\#define More(a,b) ((fabs((a)-(b)))>(eps))
+\#define Less(a,b) ((fabs((b)-(a)))>(eps))
+\#define MoreEqu(a,b) (((a)-(b))>(eps))
