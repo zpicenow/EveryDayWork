@@ -68,7 +68,185 @@ int main(){
 
 const double eps = 1e-8
 
-\#define Equ(a,b) ((fabs((a)-(b)))<(eps))
-\#define More(a,b) ((fabs((a)-(b)))>(eps))
-\#define Less(a,b) ((fabs((b)-(a)))>(eps))
-\#define MoreEqu(a,b) (((a)-(b))>(eps))
+\#define Equ(a,b) ((fabs((a)-(b)))<(eps))————比较相等
+
+\#define More(a,b) (((a)-(b))>(eps))————a大于b:即a>b+eps
+
+\#define Less(a,b) (((a)-(b))<(-eps))————a小于b：即a<b-eps
+
+\#define MoreEqu(a,b) (((a)-(b))>(-eps))————a大于等于b:即a>b-eps
+
+\#define LessEqu(a,b) (((a)-(b))<(eps))————a小于等于b:即a<b+eps
+
+
+
+# 2019年01月21日打卡
++ 圆周率π  const double PI = acos(-1.0);（记得引入math.h）
++ 对于多点测试要循环读入数据可以采用while(scanf("%d",&n) != EOF) {}来循环，因为scanf的返回值代表成功读入的参数的个数，如果读取失败返回-1，用EOF（end of file）表示，而对于gets可以判断返回值是否为空：while(gets(str) != NULL)
++ PAT B1001
+```c
+/*
+ * Callatz(3n+1)猜想
+ */
+#include <stdio.h>
+int main(){
+    int count = 0;
+    int n;
+    scanf("%d",&n);
+    while(n != 1){
+        if(n %2==1) {
+            n = 3*n+1;
+        }
+            n /= 2;
+        count +=1;
+    }
+    printf("%d",count);
+}
+```
+
+
+-----
+
+```C
+/*
+ * PAT B1032
+ */
+#include <stdio.h>
+const int MAX = 100001;
+int score[MAX] = {0};
+int main(){
+
+    int n;
+    scanf("%d",&n);
+    int num,sco;
+    for (int i = 0;i<n;++i){
+        scanf("%d%d",&num,&sco);
+        score[num] += sco;
+    }
+    num = 1;
+    sco = 0;
+    for (int i = 1; i < n +1; ++i) {
+        //printf("%d",score[i]);
+        if (score[i] > sco){
+            sco = score[i];
+            num = i;
+        }
+    }
+    printf("%d %d",num,sco);
+}
+```
+
+
+------
+
+```C
+/*
+ * PAT B1036
+ */
+#include <stdio.h>
+int main(){
+    int n;
+    char c;
+    scanf("%d %c", &n, &c);
+    int col;
+    if (n % 2 == 0) {
+        col = n/2;
+    } else {
+        col = n / 2 + 1;
+    }
+    for (int i = 0; i < col; ++i) {
+        if (i == 0 || i == col - 1) {
+            for (int j = 0; j < n; ++j) {
+                printf("%c",c);
+            }
+        } else {
+            for (int j = 0; j < n; ++j) {
+                if (j == 0 || j == n - 1) {
+                    printf("%c",c);
+                } else {
+                    printf(" ");
+                }
+            }
+        }
+        printf("\n");
+    }
+}
+```
+
++ 日期差值：拆分成年月日，一直加一，超过就进位，加到比第大日期大一天位置：
+```C
+//
+// Created by zhaopeng on 19-1-21.
+//
+
+/*
+ * codeup1928 日期之差
+ */
+#include <stdio.h>
+
+int month[13][2] = {{0, 0}, {31, 31}, {28, 29}, {31, 31}, {30, 30}, {31, 31}, {30, 30}, {31, 31}, {31, 31},
+                         {30, 30}, {31, 31}, {30, 30}, {31, 31}};
+
+bool isLeap(int year) {
+    return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+}
+int main(){
+
+    int time1, time2, y1, y2, m1, m2, d1, d2;
+    while (scanf("%d%d", &time1, &time2) != EOF) {
+        if (time1 > time2) {
+            int temp = time1;
+            time1 = time2;
+            time2 = temp;
+        }
+        y1 = time1 / 10000;
+        y2 = time2 / 10000;
+        m1 = time1 % 10000 /100;
+        m2 = time2 % 10000 /100;
+        d1 = time1 % 100;
+        d2 = time2 % 100;
+
+        int ans = 1;
+        while ((y1 < y2) || (m1 < m2) || (d1 < d2)) {
+            d1++;
+            if (d1 == month[m1][isLeap(y1)]+1) {
+                m1 ++;
+                d1 = 1;
+            }
+            if (m1 == 13) {
+                y1 ++;
+                m1 = 1;
+            }
+            ans ++;
+
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+
+
+}
+```
+
+```C
+/*
+ * PAT B1009 说反话，将给定的句子中的单词反序
+ */
+#include <stdio.h>
+int main(){
+    char str[90][90];
+    int num = 0;
+    while (scanf("%s", str[num]) != EOF) {
+        num++;
+    }
+    for (int i = num - 1; i > -1; --i) {
+        printf("%s", str[i]);
+        if (i != 0) {
+            printf(" ");
+        }
+    }
+
+
+}
+```
+
