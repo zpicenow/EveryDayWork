@@ -38,7 +38,7 @@
 *sprintf(str,"%d",n)*————将整数n转化为字符串str
 
 **其中格式化的部分（第二个参数）还可以根据str格式匹配适应，比如：**
-```C
+```c
 #include<stdio.h>
 #include<string.h>
 int main(){
@@ -107,7 +107,7 @@ int main(){
 
 -----
 
-```C
+```c
 /*
  * PAT B1032
  */
@@ -139,7 +139,7 @@ int main(){
 
 ------
 
-```C
+```c
 /*
  * PAT B1036
  */
@@ -174,7 +174,7 @@ int main(){
 ```
 
 + 日期差值：拆分成年月日，一直加一，超过就进位，加到比第大日期大一天位置：
-```C
+```c
 //
 // Created by zhaopeng on 19-1-21.
 //
@@ -228,7 +228,7 @@ int main(){
 }
 ```
 
-```C
+```c
 /*
  * PAT B1009 说反话，将给定的句子中的单词反序
  */
@@ -250,3 +250,159 @@ int main(){
 }
 ```
 
+# 2019年01月22日打卡
++ C语言的qsort函数由于涉及很多指针操作并且没有规避快排中的最简单情况，所以推荐使用C++中的sort函数
+> ## sort(首元素地址，尾元素地址的下一地址，比较函数)
+> + 使用时引入#include<algorithm> 以及 using namespace std
+> + 简单数据类型比较函数的定义：
+
+```c
+bool cmp(T a,T b){
+    return a>b;
+}
+//其中T可以为int，char，double
+sort(a,a+n+1,cmp);
+```
+> + 对于结构体同理可以根据结构体内的元素写比较函数
+```c
+bool cmp(struct s1,struct s2){
+    return s1.val>s2.val;
+}
+//按照结构体的val属性从大到小排列
+```
+> + 二级排序
+```c
+bool cmp(struct s1,struct s2){
+    if(s1.a != s2.a)
+        return s1.a > s2.a;
+    else
+        return s1.b > s2.b;
+}
+//
+```
+> + 容器排序：STL 标准容器只有vector，string，deque可以使用sort排序，排序的cmp函数与容器元素类型有关，比如
+```c
+bool cmp(int a,int b){
+    return a > b;
+}
+vector<int> vi;
+sort(vi.begin(),vi.end,cmp);
+```
+
++ string的话不写cmp直接按照字典顺序排序
+```c
+string str[3] = {"bbb","sss","aaaaa"};
+sort(str,str+3);
+//或者指定cmp
+bool cmp(string s1,string s2){
+    return s1.length() < s2.length();
+}
+sort(str,str+3,cmp);    //按照长度从小到大排序
+```
+
+### 散列
+> 将元素通过函数转化成一个整数，使得这个整数可以唯一地表示这个元素
++ 线性变换
++ 除留余数法： H(key) = key % m; m为素数
++ 平方取中法： 将key平方之后取中间的几位
+
+防止冲突的方法：
++ 线性探查法： 一直+1寻找没有被占据的位置
++ 平方探查法： +/- k++的平方
++ 链地址法： 每个哈西值对应一个单链表
+
+空间换取时间例题：在m个预查询的数中判断n个数是否出现过，m，n均小于十的五次方————空间换时间
+开辟十的五次方个bool数组，在m输入时就将出现的位置置为true
+```c
+/*
+ * m,n < 1 e5
+ * 判断n个数中是否出现在m中
+ * 空间换时间
+ */
+#include <stdio.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
+bool maxN[10010] = {false};
+int main(){
+    int n, m;
+    int num;
+    vector<int> Nv;
+    scanf("%d%d", &n, &m);
+    for (int i = 0; i < m; ++i) {
+        scanf("%d", &num);
+        maxN[num] = true;
+    }
+    for (int j = 0; j < n; ++j) {
+        scanf("%d", &num);
+        if (maxN[num]) {
+            Nv.push_back(num);
+        }
+    }
+    for (int k = 0; k < Nv.size() - 1; ++k) {
+        printf("%d ", Nv.at(k));
+    }
+    printf("%d", Nv.at(Nv.size()-1));
+}
+```
+
++ 字符串散列：将字符串转化为惟一的数
+常用的方法时进制转换：
+比如如果只有大写字母或者小写字母，那就把26进制转化为十进制，对应的数值肯定是惟一的
+```c
+int hashFun(char s[], int len){
+    int id = 0;
+    for(int i = 0;i < len;++i){
+        id = id * 26 + (s[i]-'A');
+    }
+    return id;
+}
+```
+如果是多种字母混合，可以扩充进制位数，比如大小写混合就是26+26=52位，其中大写对应从0-25,小写对应从26-51
+```c
+int hashFun(char s[], int len){
+    int id = 0;
+    for(int i = 0;i < len;++i){
+        if(s[i] >= 'A' && s[i] <= 'Z' ){
+            id = id * 52 + (s[i] - 'A');
+        }else if(s[i] >= 'a' && s[i] <= 'z'){
+            id = id * 52 +(s[i] - 'a') + 26;
+        }
+
+
+    }
+    return id;
+}
+
+```c
+/*
+ * 给出N个字符串（由恰好三位大写字母组成），再给除M个查询字符串，问每个查询字符串出现的次数
+ */
+#include <stdio.h>
+
+const int maxn = 100;
+char S[maxn][5], temp[5];
+int hashTable[26 * 26 * 26 + 10];
+int hashFun(char s[], int len){
+    int id = 0;
+    for(int i = 0;i < len;++i){
+        id = id * 26 + (s[i]-'A');
+    }
+    return id;
+}
+int main(){
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 0; i < n; ++i) {
+        scanf("%s", S[i]);
+        int id = hashFun(S[i], 3);
+        hashTable[id]++;
+    }
+    for (int j = 0; j < m; ++j) {
+        scanf("%s", temp);
+        int id = hashFun(temp, 3);
+        printf("%d\n", hashTable[id]);
+    }
+    return 0;
+}
+```
