@@ -406,3 +406,283 @@ int main(){
     return 0;
 }
 ```
+
+# 2019年01月23日打卡
+### 分治法：
+> 注意分治法解决的子问题应该是互相独立，没有交叉的，如果子问题之间存在相交部分不应该用分治法
+
++ 使用递归的方法实现分治法较为容易
+> 要理解递归，你要先理解递归，直到你能理解递归
+
+按字典序的全排列问题
+```c
+/*
+ * 全排列，以n=3为例，体会分治递归思想
+ */
+#include <stdio.h>
+const int MAX = 11;
+int n, p[MAX], hashTable[MAX] = {false};
+
+void generateP(int index) {
+    if (index == n + 1) {
+        for (int i = 1; i <= n; ++i) {
+            printf("%d", p[i]);
+        }
+        printf("\n");
+        return;
+    }
+    for (int j = 1; j <= n; ++j) {
+        if (hashTable[j] == 0) {
+            p[index] = j;
+            hashTable[j] = true;
+            generateP(index + 1);
+            hashTable[j] = false;
+        }
+    }
+}
+int main() {
+    n = 3;
+    generateP(1);
+    return 0;
+}
+```
+
+n皇后问题
+```c
+/*
+ * n皇后问题
+ */
+#include <stdio.h>
+#include <math.h>
+const int MAX = 10000;
+int n, p[MAX], hashTable[MAX] = {false};
+int count = 0;
+void generateP(int index) {
+    if (index == n + 1) {   //  递归边界，生成一个合法方案
+        count++;    //能到达这里的一定是合法方案
+        return;
+    }
+
+    for (int i = 1; i <= n; ++i) {  //第i行
+        if (hashTable[i] == 0) {    //第i行还没有皇后
+            bool flag = true;   //flag为true表示当前皇后不会和其他皇后冲突
+            for (int pre = 1; pre < index; ++pre) { //遍历之前的皇后
+                //第index列的皇后行号为i，第pre列的皇后行号为p[pre]
+                if (abs(index - pre) == abs(i - p[pre])) {
+                    flag = false;   //在一条对角线
+                    break;
+                }
+
+
+            }
+            if (flag) { //可以把皇后放在第i行
+
+                p[index] = i;   //另index列的皇后行号为i
+                hashTable[i] = true;    //第i行已经被占用
+                generateP(index + 1);
+                hashTable[i] = false;
+            }
+
+        }
+    }
+}
+int main() {
+    n = 8;
+    generateP(1);
+    printf("%d", count);
+    return 0;
+}
+```
+### 贪心
++ 总是考虑当前局部最优，以达到全局最优
+
+```c
+/*
+ * PAT B 1020 月饼
+ */
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+const int MAX = 1001;
+struct MOON {
+    double store;
+    double sell;
+    double price;
+};
+
+bool cmp(MOON m1, MOON m2) {
+    return m1.price > m2.price;
+}
+int main(){
+    int n;
+    double total;
+    scanf("%d%lf", &n, &total);
+    MOON moon[MAX];
+    for (int i = 0; i < n; ++i) {
+        scanf("%lf", &moon[i].store);
+    }
+    for (int j = 0; j < n; ++j) {
+        scanf("%lf", &moon[j].sell);
+
+    }
+    for (int k = 0; k < n; ++k) {
+        moon[k].price = moon[k].sell / moon[k].store;
+    }
+
+    double value = 0.0;
+    sort(moon, moon + n, cmp);
+    for (int l = 0; (l < n)&&(total > 0); ++l) {
+        if (total <= moon[l].store) {
+            value +=  moon[l].price * total;
+            total = 0;
+        } else {
+            value += moon[l].sell;
+            total -= moon[l].store;
+        }
+    }
+    printf("%.2f", value);
+}
+```
+
+组个最小数
+```c
+
+/*
+ * PAT B 1023
+ * 组个最小数
+ */
+#include <stdio.h>
+int main() {
+    int count[10];
+    for (int i = 0; i < 10; ++i) {
+        scanf("%d", &count[i]);
+
+    }
+
+    for (int j = 1; j < 10; ++j) {
+        if (count[j] != 0) {
+            printf("%d", j);
+            --count[j];
+            break;
+        }
+    }
+    for (int k = 0; k < 10; ++k) {
+        while (count[k] != 0) {
+            printf("%d", k);
+            --count[k];
+        }
+    }
+}
+```
+
+
+区间贪心
+
+**区间选点问题**
+给出N个闭区间\[x,y]，求最少需要确定多少个点，才能使每个闭区间中都至少存在一个点
+```c
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+const int MAX = 110;
+struct AREA {
+    int x, y;
+
+} area[MAX];
+
+bool cmp(AREA a1, AREA a2) {    //左端点从大到小排序，左端点相同，右端点从小到大排序
+    if (a1.x != a2.x) {
+        return a1.x > a2.x;
+    } else {
+        return a1.y < a2.y;
+    }
+}
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; ++i) {
+        scanf("%d%d", &area[i].x, &area[i].y);
+
+    }
+    sort(area, area + n, cmp);
+    int ans = 1, lastX = area[0].x;     //ans记录不相交区间个数，lastX记录上一个被选中的区间左端点
+    for (int j = 1; j < n; ++j) {
+        if (area[j].y < lastX) {
+            lastX = area[j].x;
+            ++ans;
+        }
+    }
+    printf("%d", ans);
+}
+
+```
+
+### 二分
++ 二分法查找
+```c
+int binarySearch(int A[], int left, int right, int x) {
+    int mid;
+    while (left < right) {
+        mid = (left + right) / 2;       //防溢出替换为mid = left + (right - left) / 2
+        if (A[mid] == x) {
+            return mid;
+        } else if (A[mid] > x) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+
+        }
+
+
+    }
+    return -1;
+}
+```
+
+固定模板
+**闭区间寻找有序序列中第一个满足某条件的元素位置**
+```c
+int solve(int left, int right){
+    int mid;
+    while (left < right) {
+        mid = (left + right) / 2;       //防溢出替换为mid = left + (right - left) / 2
+        if (条件成立) {
+            right = mid;
+        } else {
+            left = mid + 1;
+
+        }
+
+
+    }
+    return left;
+}
+```
+
+如果是想找出最后一个满足条件的元素位置，那么就是找出第一个不满足条件的元素位置-1
+如果是在左开有闭区间，那么把while条件改为left+1<right即可
+
++ 二分法拓展
+求根号2的近似值----》给定一个定义在\[L,R]区间上的单调函数f(x)，求f(x)=0的近似根
+```c
+const double eps = 1e-5;    //精度为10的-5次方
+double f(double x){     //计算f(x)
+    return ....;
+}
+double solve(double L, double R) {
+    double left = L, right = R, mid;
+    while (right - left > eps) {
+        mid = (left + right) / 2;
+        if (f(mid) > 0) {
+            right = mid;
+        } else {
+            left = mid;
+        }
+    }
+    return mid;
+}
+```
+
+如果f(x)递减，只需把f(mid)>0改成f(mid) < 0即可
