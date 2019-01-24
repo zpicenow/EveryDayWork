@@ -662,7 +662,7 @@ int solve(int left, int right){
 ```
 
 如果是想找出最后一个满足条件的元素位置，那么就是找出第一个不满足条件的元素位置-1
-如果是在左开有闭区间，那么把while条件改为left+1<right即可
+如果是在左开右闭区间，那么把while条件改为left+1<right,同时left = mid + 1改为left = mid即可
 
 + 二分法拓展
 求根号2的近似值----》给定一个定义在\[L,R]区间上的单调函数f(x)，求f(x)=0的近似根
@@ -686,3 +686,202 @@ double solve(double L, double R) {
 ```
 
 如果f(x)递减，只需把f(mid)>0改成f(mid) < 0即可
+
+# 2019年01月24日打卡
+二分法解决木棒切割问题
+给出N根木棒，长度均已知，现通过切割他们，得到至少K段长度相等的木棒（长度必须是整数），问长度相等的木棒最长能有多长
+比如三根长度分别为10,24,15的木棒，希望K值为7，求最大长度
+
+对于这一问题,首先注意到一个结论，相等的木棒长度L越长，木棒段数k越小，则可以采用二分法求解答案，即是求解满足长度k≥K的最后一个L值
+即是求解满足k＜K的第一个L值-1，显然木棒段的最大长度不得超过木棒的最大长度，所以left=1，right=最大木棒长度：
+```c
+/*
+ * 切割木棒问题
+ *给出N根木棒，长度均已知，现通过切割他们，得到至少K段长度相等的木棒（长度必须是整数），问长度相等的木棒最长能有多长
+ *比如三根长度分别为10,24,15的木棒，希望K值为7，求最大长度
+ */
+#include <stdio.h>
+
+const int MAX = 100;
+int stick[MAX] = {0};
+int n, k;
+
+int solve(int L, int R, int K) {
+    int mid, count = 0;
+    while (L + 1 < R) {
+
+        count = 0;
+        mid = (L + R) / 2;
+        for (int i = 0; i < n; ++i) {
+            count += stick[i] / mid;
+        }
+        if (count < K) {
+            R = mid;
+        } else {
+            L = mid;
+        }
+    }
+    return mid;
+}
+
+int main() {
+    int maxL = -1;
+    scanf("%d%d", &n, &k);
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &stick[i]);
+        if (stick[i] > maxL) {
+            maxL = stick[i];
+        }
+    }
+    printf("%d", solve(1, maxL, k) - 1);
+
+    return 0;
+
+}
+```
+
+
+### 快速幂（二分幂）
+给定三个正整数a，b，m，求a^b%m
+当b是数量级很大的数时，显然使用循环的复杂度会很高
+因此引入二分的思想
+
++ 若b是奇数，则有a^b = a * a^(b-1);
++ 若b是偶数，则有a^b = a^(b/2) * a^(b/2);
+
+这样，在log(b)级别的转化之后，一定会得到a^0,再回退得到每一步的结果，因此得到快速幂的递归写法，时间复杂度为O(log b)
+```c
+typedef long long LL;
+LL binaryPow(LL a,LL b,LL m){
+    if (b == 0) {
+        return 1;
+    } else {
+        if (b &1) {
+            return a * binaryPow(a, b - 1, m) % m;
+        } else {
+            LL num = binaryPow(a, b / 2, m);
+            return num * num % m;
+        }
+
+    }
+}
+```
+
+**一个小技巧：对数进行奇偶判断时，可以使用n & 1,判断末位是不是1，对于需要判断奇偶的场合这种位运算效率会更高一点**
+
+还有一种基于位运算的快速幂写法，但其实在实际应用中效率和递归差别并不大
+这种位运算的原理是 a^b 一定可以写成 a^(2k)...a^8,a^4,a^2,a^1之中若干项的乘积
+```c
+typedef long long LL;
+
+LL binaryPow(LL a, LL b, LL m) {
+    LL ans = 1;
+    while (b > 0) {
+        if (b & 1) {
+            ans = ans * a % m;
+        }
+        a = a * a % m;
+        b >>= 1;
+    }
+    return ans;
+}
+```
+
+## two pointers
+two points是一种常用的算法思想，即多指针遍历，通过遍历对象的规律而降低循环次数，减少复杂度
+### 归并排序
++ 常见的二路归并： 将序列两两一组分成n/2组，组内排序，然后逐渐合并
+```c
+/*
+ * 归并排序
+ */
+#include <stdio.h>
+const int maxn = 100;
+void merge(int A[],int L1,int R1,int L2,int R2) {
+    int i = L1, j = L2, temp[maxn], index = 0;
+
+    while ((i < R1) && (j < R2)) {
+        if (A[i] <= A[j]) {
+            temp[index++] = A[i++];
+        } else {
+            temp[index++] = A[j++];
+        }
+    }
+    while (i <= R1) {
+        temp[index++] = A[i++];
+    }
+    while (j <= R2) {
+        temp[index++] = A[j++];
+    }
+    for (int k = 0; k < index; ++k) {
+        A[L1 + k] = temp[k];
+    }
+}
+//递归的归并
+void mergeSort(int A[],int left,int right) {
+    if (left < right) {
+        int mid = (left + right) / 2;
+        mergeSort(A, left, mid);
+        mergeSort(A, mid + 1, right);
+        merge(A, left, mid, mid + 1, right);
+    }
+}
+//非递归的归并
+void mergeSort(int A[]) {
+    for (int step = 2; (step / 2) <= n; step *= 2) {
+        for (int i = 1; i < n; i += step) {
+            int mid = i + step / 2 - 1;
+            if (mid + 1 <= n) {
+                merge(A, i, mid, mid + 1, min(i + step - 1, n));
+            }
+        }
+    }
+}
+```
+
+
+### 快排
+```c
+/*
+ * 快排
+ */
+int partition(int A[],int left,int right) {
+    int temp = A[left];
+    while (left < right) {
+        while ((left < right) && (A[right] > temp)) {
+            --right;
+        }
+        A[left] = A[right];
+        while ((left < right) && (A[left] <= temp)) {
+            ++left;
+        }
+        A[right] = A[left];
+    }
+    A[left] = temp;
+    return left;
+}
+
+//
+void quickSort(int A[], int left, int right) {
+    if (left < right) {
+
+        int position = partition(A, left, right);
+        quickSort(A, left, position - 1);
+        quickSort(A, position + 1, right);
+    }
+}
+
+```
+
+### 随机数
+```c
+#include <stdlib.h>
+#include <time.h>
+int main(){
+    srand((unsigned int) time(NULL));
+    rand();
+}
+```
+
+rand()%(n)生成随机数的范围是 \[0,n-1]
+因此想要生成\[a,b]范围内的就可以用rand()%(b-a+1) +a

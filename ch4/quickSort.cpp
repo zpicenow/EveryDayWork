@@ -1,0 +1,32 @@
+//
+// Created by zhaopeng on 19-1-24.
+//
+
+/*
+ * 快排
+ */
+int partition(int A[],int left,int right) {
+    int temp = A[left];
+    while (left < right) {
+        while ((left < right) && (A[right] > temp)) {
+            --right;
+        }
+        A[left] = A[right];
+        while ((left < right) && (A[left] <= temp)) {
+            ++left;
+        }
+        A[right] = A[left];
+    }
+    A[left] = temp;
+    return left;
+}
+
+//
+void quickSort(int A[], int left, int right) {
+    if (left < right) {
+
+        int position = partition(A, left, right);
+        quickSort(A, left, position - 1);
+        quickSort(A, position + 1, right);
+    }
+}
