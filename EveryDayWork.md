@@ -885,3 +885,96 @@ int main(){
 
 rand()%(n)生成随机数的范围是 \[0,n-1]
 因此想要生成\[a,b]范围内的就可以用rand()%(b-a+1) +a
+
+
+
+# 2019年01月25日打卡
+
+### 打表
+一种典型的空间换时间的方法，一般指将所有可能用到的结果事先计算出来，之后用到的时候直接查表
++ 在一次性计算出所有结果
+比如一个程序如果需要计算**大量的**斐波那契数，如果每次都从头开始算就会有很多重复的过程，因此把需要用到的先进行预处理，相对会省一些时间
+
++ 在B中计算出结果，手动写入程序A中
+这种用法是由于程序某一部分时间较长，又相对没有更好的解决方法时，比如计算N皇后问题，很容易超时，就可以在本地先计算出复杂的n，在手动写到线上程序中
++ 对于一些不会做的题目，先暴力求解一部分情况，寻找规律及突破口
+### 活用递推
+例如有一类涉及序列的问题，序列每一位需要计算的值与其两侧的值有关，那么就可以根据递归确定两侧的值
+比如PAT B1040
+>字符串 APPAPT 中包含了两个单词 PAT，其中第一个 PAT 是第 2 位(P)，第 4 位(A)，第 6 位(T)；第二个 PAT 是第 3 位(P)，第 4 位(A)，第 6 位(T)。
+现给定字符串，问一共可以形成多少个 PAT？
+输入只有一行，包含一个字符串，长度不超过10​5​​，只包含 P、A、T 三种字母。
+在一行中输出给定字符串中包含多少个 PAT。由于结果可能比较大，只输出对 1000000007 取余数的结果。
+
+直接暴力的话一定是会超时的，换个角度想的话，字符串中能构成PA的数目等于每个A前面P的數目的和，能够成PAT的数目等于每个T前面PA数目的总和，因此在一次遍历中递推地得到相关的数量，然后乘积即可
+
+```c
+#include <stdio.h>
+#define LIM 1000000007
+int main()
+{
+    unsigned int P = 0, PA = 0, PAT = 0;
+    char c;
+    while((c = getchar()) != '\n')
+    {
+        if(c == 'P')   P++;
+        if(c == 'A')   PA = (PA + P) % LIM;
+        if(c == 'T')   PAT = (PAT + PA) % LIM;
+    }
+    printf("%d", PAT);
+    return 0;
+}
+```
+
+### 随机选择
+主要围绕这样一个问题
+
+如何从一个无序数组中输出第N大的数
+
+最简单的想法是先排序，再选择，那么复杂度大概在O(nlogn)，
+
+而这种随机选择算法对于任何输入期望复杂度都是O(n)
+
+其思想类似于快排，执行一次左右分割后， 主元左侧的都是小于他的，即主元A\[p]就是第K=p-left +1大的数，假设这就是所求的N，那么就直接返回主元，如果K＞N，就说明要求的数在主元左侧，则向左递归，同理如果K ＜N，就说明要求的数在主元右侧，向右递归
+```c
+/*
+ * 随机选择算法
+ */
+#include <stdio.h>
+int randParitition(int A[],int left,int right) {
+    int temp = A[left];
+    while (left < right) {
+        while ((left < right) && (A[right] < temp)) {
+
+            --right;
+        }
+        A[left] = A[right];
+        while ((left < right) && (A[left] <= temp)) {
+            ++left;
+        }
+        A[right] = A[left];
+    }
+    A[left] = temp;
+    return left;
+}
+int randSelect(int A[], int left, int right, int K) {
+    if (left == right) {
+        return A[left];
+    }
+    int p = randParitition(A, left, right);
+    int M = p - left + 1;
+    if (K == M) {
+        return A[M];
+
+    } else if (M < K) {
+        return randSelect(A, p + 1, right, K - M);
+
+    } else {
+        return randSelect(A, left, p - 1, K);
+    }
+}
+
+```
+
+
+
