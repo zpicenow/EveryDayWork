@@ -978,3 +978,228 @@ int randSelect(int A[], int left, int right, int K) {
 
 
 
+
+# 2019年01月26日打卡
+
+### 简单数学
+不涉及太多算法内容，注意数理逻辑即可
+PAT B1019 数字黑洞
+```c
+
+/*
+ * PAT B 1019
+ * 数字黑洞
+ */
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+
+bool cmp(int a, int b) {
+    return a > b;
+}
+
+void to_array(int n, int num[]) {
+    for (int i = 0; i < 4; ++i) {
+        num[i] = n % 10;
+        n /= 10;
+    }
+}
+
+int to_number(int num[]) {
+    int sum = 0;
+    for (int i = 0; i < 4; ++i) {
+        sum = sum * 10 + num[i];
+    }
+    return sum;
+}
+int main() {
+    int n, MIN, MAX;
+    scanf("%d", &n);
+    int num[5];
+    while (1) {
+        to_array(n, num);
+        sort(num, num + 4);
+        MIN = to_number(num);
+        sort(num, num + 4, cmp);
+        MAX = to_number(num);
+        n = MAX - MIN;
+        printf("%04d - %04d = %04d", MAX, MIN, n);
+        if (n == 0 || n == 6174) {
+            break;
+        }
+        return 0;
+    }
+}
+```
+
+### 最大公约数与最小公倍数
+
+欧几里得-辗转相除法
+```c
+int gcd(int a,int b){
+    if(b == 0) return a;
+    else return gcd(b,a % b);
+}
+```
+
+最大公倍数
+得到最小公约数d后，lcm = a * b /d
+但是在实际中a*b可能会溢出，所以写成 a/d * b
+
+
+### 分数的四则混合运算
+**分数的表示与化简**
++ 如果分母为负数，分子分母同取相反数
++ 如果分数为零，规定分子为0，分母为1
++ 分子和分母通过最大公约数进行约分
+```c
+/*
+ * 分数
+ */
+
+#include <math.h>
+
+struct Fraction {
+    int up,down;
+};
+int gcd(int a,int b) {
+    if (b == 0) {
+        return a;
+    } else return gcd(a, a % b);
+
+}
+Fraction reduction(Fraction result) {
+    if (result.down < 0) {
+        result.down = -result.down;
+        result.up = -result.up;
+
+    }
+    if (result.up == 0) {
+        result.down = 1;
+    } else {
+        int d = gcd(abs(result.up), abs(result.down));
+        result.up /= d;
+        result.down /= d;
+    }
+    return result;
+}
+```
+
+**分数加法**
+```c
+Fraction add(Fraction f1,Fraction f2) {
+    Fraction result;
+    result.up = f1.up * f2.down + f2.up * f1.down;
+    result.down = f1.down * f2.down;
+
+    return reduction(result);
+}
+```
+
+
+**分数减法**
+```c
+Fraction minu(Fraction f1,Fraction f2) {
+    Fraction result;
+    result.up = f1.up * f2.down - f2.up * f1.down;
+    result.down = f1.down * f2.down;
+
+    return reduction(result);
+}
+```
+
+**分数乘法**
+```c
+//分数乘法
+Fraction mul(Fraction f1,Fraction f2) {
+    Fraction result;
+    result.up = f1.up * f2.up;
+    result.down = f1.down * f2.down;
+    return reduction(result);
+}
+```
+
+**分数除法**
+```c
+//分数除法
+Fraction div(Fraction f1,Fraction f2) {
+    Fraction result;
+    result.up = f1.up * f2.down;
+    result.down = f1.down * f2.up;
+    return reduction(result);
+}
+```
+
+**分数的输出**
++ 化简
++ 如果分母为1，则输出整数（视题目要求）
++ 对于假分数（视题目要求）输出带分数
+
+```c
+void showResult(Fraction r) {
+    r = reduction(r);
+    if (r.down == 1) {
+        printf("%d", r.up);
+    } else if (abs(r.up) > r.down) {
+        printf("%d %d/%d", r.up / r.down, abs(r.up) % r.down, r.down);
+
+    } else {
+        printf("%d/%d", r.up, r.down);
+    }
+}
+```
+
+### 素数
+判断素数
+```c
+bool isPrime(int n) {
+    if (n <= 1) {
+        return false;
+    }
+    int sqr = (int) sqrt(1.0 * n);
+    for (int i = 2; i <= sqr; ++i) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+```
+
+**素数表筛法**
+
+根据前一种判断素数生成素数表的时间复杂度为O(n根号n)
+当数量较大时时间过长
+因此介绍这种筛法
+筛法的重点就在于筛
+
+比如2是素数，那么就把随后2的倍数全都排除掉
+
+3没有被排除，因此3是素数，随后把3的倍数筛掉
+
+（4）由于已被筛掉所以继续
+
+5没有被筛掉，所以5是素数......
+
+
+当从小到大到达某数a时，如果a没有被筛掉，那么a一定是素数
+
+```c
+//素数筛法
+const int maxn = 101;
+int prime[maxn], pNum = 0;
+bool p[maxn] = {0};
+void Find_Prime() {
+    for (int i = 2; i < maxn; ++i) {
+        if (!p[i]) {
+            prime[pNum++] = i;
+            for (int j = i + 1; j < maxn; j += i) {
+                p[j] = true;
+            }
+        }
+    }
+}
+```
+
+该算法的时间复杂度为O(nloglogn)
