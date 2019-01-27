@@ -1205,3 +1205,322 @@ void Find_Prime() {
 该算法的时间复杂度为O(nloglogn)
 筛法的精髓在于那句for (int j = i + i; j < maxn; j += i)
 
+
+# 2019年01月27日打卡
+
+### 质因子分解
+
+定义结构体存储质数及指数
+```c
+struct factor{
+    int x,cnt;
+}fac[10];
+```
+
+因为前十位质数的乘积就已经超过int范围了，所以定义fac数组取十位就够了
+
+前面提到对于一个整数来说，如果存在1和本身之外的因子则一定是对称分布的，因此可以引申到质因子上
+
++ 枚举1到sqrt(n)的所有质子p，判断p是否为n的因子，如果p是一个质因子就初始化p的cnt为0，只要p还是n的质因子，就另n/ p，cnt
+的个数不断加一，直到不再是一个质因子
++ 如果p不是n的质因子就直接跳过
+
++ 如果经过上述过程n仍大于一，则说明n有且仅有一个大于sqrt(n)的质因子，有可能是n本身，这时候需要把质因子加入到fac中
+
+PAT A1059 分解质因子
+
+```c
+/*
+ * PAT A 1059
+ * 分解质因子 Prime factor
+ */
+#include <stdio.h>
+#include <math.h>
+
+const int maxn = 100010;
+bool isPrime(int n) {
+    if (n == 1)return false;
+    int sqr = static_cast<int>(sqrt(1.0 * n));
+    for (int i = 2; i <= sqr; ++i) {
+        if (n % i == 0) {
+            return false;
+
+        }
+    }
+    return true;
+}
+
+int prime[maxn], pNum = 0;
+void Find_Prime() {
+    for (int i = 1; i < maxn; ++i) {
+        if (isPrime(i)) {
+            prime[pNum++] = i;
+        }
+    }
+}
+
+struct factor {
+    int x, cnt;
+
+} fac[10];
+int main() {
+    Find_Prime();
+    int n, num = 0;
+    scanf("%d", &n);
+    if (n == 1) {
+        printf("1=1");
+
+    } else {
+        printf("%d=", n);
+        int sqr = static_cast<int>(sqrt(1.0 * n));
+        for (int i = 0; i < pNum && prime[i] <= sqr; ++i) {
+            if (n % prime[i] == 0) {
+                fac[num].x = prime[i];
+                fac[num].cnt = 0;
+                while (n % prime[i] == 0) {
+                    fac[num].cnt++;
+                    n /= prime[i];
+                }
+                num++;
+            }
+            if (n == 1) {
+                break;
+            }
+        }
+        if (n != 1) {
+            fac[num].x = n;
+            fac[num++].cnt = 1;
+        }
+    }
+
+    for (int j = 0; j < num; ++j) {
+        if (j > 0) {
+            printf("*");
+            printf("%d", fac[j].x);
+            if (fac[j].cnt > 1) {
+                printf("^%d", fac[j].cnt);
+
+            }
+        }
+    }
+    return 0;
+}
+```
+
+## 大整数运算
+
+大整数又称高精度整数
+
+### 大整数储存
+用数组来储存大整数，数组的高位储存大整数的高位，数组的低位储存大整数的低位，这样保持运算时从低位开始
+
+```c
+struct bigN {
+    int d[1000];
+    int len;
+
+    bigN() {
+        memset(d, 1000, sizeof(d));
+        len = 0
+    }
+};
+
+
+```
+
+如果是由字符串读入的需要进行逆序
+
+```c
+int compare(bigN a, bigN b) {
+    if (a.len > b.len) {
+        return 1;
+    } else if (a.len < b.len) {
+        return -1;
+    } else {
+        for (int i = a.len - 1; i >= 0; --i) {
+            if (a.d[i] > b.d[i]) {
+                return 1;
+            } else if (a.d[i], b.d[i]) {
+                return -1;
+            }
+        }
+        return 0;
+
+    }
+}
+
+```
+
+
+### 大整数加法
+
+```c
+bigN add(bigN a, bigN b) {
+    bigN c;
+    int carry = 0;  //进位
+    for (int i = 0; i < a.len || i < b.len; ++i) {
+        int temp = a.d[i] + b.d[i] + carry;
+        c.d[c.len++] = temp % 10;
+        carry = temp / 10;
+    }
+    if (carry != 0) {
+        c.d[c.len++] = carry;
+    }
+    return c;
+}
+
+```
+
+### 大整数减法
+
+```c
+bigN sub(bigN a,bigN b) {
+    bigN c;
+    for (int i = 0; i < a.len || i < b.len; ++i) {
+        if (a.d[i] < b.d[i]) {
+            --a.d[i + 1];
+            a.d[i] += 10;
+        }
+        c.d[c.len++] = a.d[i] - b.d[i];
+    }
+    while (c.len - 1 >= 1 && c.d[c.len - 1] == 0) {
+        c.len--;
+    }
+    return c;
+}
+```
+
+### 高精度与低精度的乘法
+
+```c
+bigN multi(bigN a,int b) {
+    bigN c;
+    int carry;
+    for (int i = 0; i < a.len; ++i) {
+        int temp = a.d[i] * b + carry;
+        c.d[c.len++] = temp % 10;
+        carry = temp / 10;
+    }
+    while (carry != 0) {
+        c.d[c.len++] = carry % 10;
+        carry /= 10;
+    }
+    return c;
+}
+```
+
+### 高精度与低精度的除法
+
+```c
+bigN div(bigN a, int b,int &r) {        //r为余数
+    bigN c;
+    c.len = a.len;
+    for (int i = a.len - 1; i >= 0; --i) {
+        r = r * 10 + a.d[i];
+        if (r < b) {
+            c.d[i] = 0;
+        } else {
+            c.d[i] = r / b;
+            r %= b;
+        }
+    }
+    while (c.len - 1 >= 1 && c.d[c.len - 1] == 0) {
+        c.len--;
+    }
+}
+```
+
+## 拓展欧几里得算法
+```c
+/*
+ * 拓展欧几里得算法
+ */
+#include <stdio.h>
+
+int exGcd(int a, int b, int &x, int &y) {
+    if (b == 0) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    int g = exGcd(b, a % b, x, y);
+    int temp = x;
+    x = y;
+    y = temp - a / b * y;
+    return g;
+}
+```
+
+费马小定理：m是素数，a是任意数且a%m≠0，则a^(m-1) mod m = 1
+
+## 组合数
+
+从一个问题谈起：
+n！中有多少个质因子p，即分解质因子后，质数p的次数是多少
+正常的遍历方法复杂度为O(nlogn)，但是通过观察我们可以得到这样的规律
+
+n!中有(n/p + n/p^2 + n/p^3....)个质因子p
+
+其中每一个除法都是向下取整
+于是我们得到了O(logn)的代码
+
+```c
+int cal(int n,int p){
+    int ans = 0;
+    while(n){
+        ans += n/p;
+        n /= p;
+    }
+    return ans;
+}
+```
+
+通过这种算法可以马上解决n！中末尾有几个零，显然末尾0的个数等于因子中10的个数，等于质因子中5的个数
+因此代入cal(n,5)即可
+
+### 组合数的计算
+
+C(n,m) = n! / (m! * (n-m)!)
+
++ 显然第一种方法，直接按照定义计算，求阶乘时一定会溢出
++ 第二种方法通过递推式计算：C(n,m) = C(n-1 ,m) + C(n-1,m-1)
+
+```c
+long long C(long long n,long long m){
+    if(m == 0 || m == n) return 1;
+    return C(n-1,m) + C(n-1,m-1);
+}
+```
++ 第三种通过定义的变形：C(n,m) = (n-m+1)(n-m+2)...(n-m+m) / 1*2*3*...*m
+
+```c
+long long C(long long n,long long m){
+    long long ans = 1;
+    for(long long i = 1; i <= m; ++i){
+        ans = ans * (n-m+i)/i;
+    }
+    return ans;
+}
+```
+
+不过有可能在最后一个乘法时溢出，但是复杂度已经降低到O(m)，非常可观
+
+**Lucas定理解决C(n,m)%p问题**
+
+如果p是素数，将m和n表示为p进制
+m = m\[k]*p^k + m\[k-1]*p^(k-1) + ... + m\[0]
+n = .....
+则有C(n,m)%p = C(n\[k],m\[k]) * C(n\[k-1],m\[k-1])....%p
+
+```c
+long long p; //p为全局变量
+int Lucas(int n,int m){
+    if(m == 0) return 1;
+    return C(n%p,m%p) * Lucas(n/p,m/p) % p;
+}
+```
+
+
+
+
+
