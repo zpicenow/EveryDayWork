@@ -30,7 +30,7 @@ void Find_Prime() {
     for (int i = 2; i < maxn; ++i) {
         if (!p[i]) {
             prime[pNum++] = i;
-            for (int j = i + 1; j < maxn; j += i) {
+            for (int j = i + i; j < maxn; j += i) {
                 p[j] = true;
             }
         }

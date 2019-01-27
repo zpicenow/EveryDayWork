@@ -1194,7 +1194,7 @@ void Find_Prime() {
     for (int i = 2; i < maxn; ++i) {
         if (!p[i]) {
             prime[pNum++] = i;
-            for (int j = i + 1; j < maxn; j += i) {
+            for (int j = i + i; j < maxn; j += i) {
                 p[j] = true;
             }
         }
@@ -1203,3 +1203,5 @@ void Find_Prime() {
 ```
 
 该算法的时间复杂度为O(nloglogn)
+筛法的精髓在于那句for (int j = i + i; j < maxn; j += i)
+
