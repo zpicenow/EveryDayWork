@@ -1523,6 +1523,7 @@ int Lucas(int n,int m){
 
 
 # 2019年01月28日打卡
+*今天学的少，小年快乐（借口）*
 
 ## C++STL标准模板库
 
@@ -1552,6 +1553,57 @@ vector<int > vi;
 
 
 vector 的常用函数
++ push_back():在vector后面添加一个元素
++ pop_back(): 删除vector最后的元素，直接删除，void类型
++ size(): 返回元素个数，unsigned类型，但是用%d就可以
++ clear(): 清空
++ insert(it,x): 向任意迭代器it位置插入x
++ erase(it): 删除迭代器it处的元素，erase(first,last),删除二者之间元素，含first
+
+
+vector常见用途
++ 数组
++ 未知数目储存
++ 邻接表存储图
+
+
+### set
++ 集合
++ 有序无重复，默认递增顺序
++ 定义声明同vector
++ 只支持迭代器遍历  ，且迭代器不支持*(it+i)
+
+
+set常用函数
++ insert(x): 插入，自动排序去重
++ find(value): 返回value对应**迭代器**
++ erase(it): 删除迭代器元素值；erase(value): 删除对应的值；erase(first,last):删除迭代器区间，包含first
++ size(),clear()同上
+
+set常见用处
+自动去重并按升序排序
+set延伸为multiset //元素可重复；unordered_set //非排序集合
+
+### string
++ 头文件include<string>，注意<string>和<string.h>是两个不同的头文件
++ 定义声明与普通数据类型相同
++ 可以通过下标访问string str = "abcd"；str\[i]这样子
++ 如果要输入输出整个字符串只能用cin，cout，或者printf("%s",str.c_str());其中c_str()将字符串转化为字符数组
++ 迭代器 string::iterator it
+
+string常用函数
+
++ 重载运算符+：连接字符串，str1 += str2，连接之后赋值给str1；重载了比较运算符，比较的是字符串的字典序
++ length(),size()基本相同
++ str1.insert(pos,str2)： 在pos位置(数组下标)插入str2
++ insert(it,it1,it2): it为原字符串待插入的迭代器位置，it1，it2是要插入的字符串首尾迭代器的位置
++ erase(it),erase(first,last)同上，erase(pos,len)从pos位置删除len长度，pos类似数组标，str = "abcde"执行str.erase(3,2)删除的是de
++ clear()
++ substr(pos,len)返回pos开始，长度为len的子串
++ string::npos,是一个常数，本身是-1，代表匹配失败的值，但是由于本身是无符号数，所以也可以代表int；类型的最大值
++ find(str2):返回子串第一次出现的位置
++ replace(pos,len,str2): 将pos开始，len长度的字符串替换为str2
++ replace(it1,it2,str2)将it1,it2范围的字符串替换为str2
 
 
 
