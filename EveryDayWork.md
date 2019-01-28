@@ -1522,5 +1522,37 @@ int Lucas(int n,int m){
 
 
 
+# 2019年01月28日打卡
+
+## C++STL标准模板库
+
+### vector
++ 可变长数组
++ 头文件include<vector>  + using namespace std
++ 声明方式vector <类型> 变量名
++ 二维定义 vector<vector<int> > VI 相当于定义了一个二维的可变长数组
++ 定义vector数组 ： vector<int> Array\[n],与上一条的区别是这个一维是定长的n
++ vector可以通过下标访问0～vector.size()-1
++ 通过迭代器访问元素，相当于指针
+```c
+#include <vector>
+
+using namespace std;
+vector<int > vi;
+    //迭代器不支持 it < vi.end()的写法，只能是!=
+    for (vector<int>::iterator it = vi.begin(); it != vi.end(); ++it) {
+        printf("%d", *it);
+    }
+    //或者
+    vector<int>::iterator it2 = vi.begin();
+    for (int i = 0; i < 5; ++i) {
+        printf("%d", *(it2 + i));
+    }
+```
+
+
+vector 的常用函数
+
+
 
 
