@@ -1606,5 +1606,138 @@ string常用函数
 + replace(it1,it2,str2)将it1,it2范围的字符串替换为str2
 
 
+# 2019年01月29日打卡
+
+### map
++ 键值对映射
++ 头文件map using namespace std
++ 声明定义map<type,type> mp类型可以是普通数据类型，或者STL容器，注意**数组不能做类型**
++ 通过下标访问：即根据键访问值，比如定义一个map<char,int> mp;就可以根据mp\['c']这种键的形式访问值
++ 通过迭代器访问，创建迭代器方式类似，map<int,int>::iterator it;it.first表示键，it.second表示值
++ map内部与set一样应用红黑树储存，因此默认按照键的升序排列
+
+map常用函数
++ find(key):由键索值,返回的是该映射的迭代器
++ erase(it);erase(key);erase(first,last)类似前文
++ size(),clear()
+
+常见用途
++ 建立字符串与整数之间的映射
++ 判断大整数或者其他类型数据是否存在可以把map当成bool数组用
++ multimap是一个键对应多个值，unordered_map是无序的效率更高
+
+### queue
++ 队列，先进先出的容器
++ 声明定义是STL的一般形式
++ 只能通过front()和back()访问队列首和末尾的元素
+
+queue常用函数
++ push(x): x入队列
++ front(),back()
++ pop(): 队首元素出队列
++ empty(): 返回队列是否为空
++ size()
+
+queue常见用途
+树的广度优先搜索
+deque是双向队列
+
+### priority_queue
+
++ 优先队列，底层用堆来实现，队首元素一定是当前队列中优先级最高的元素
++ 头文件就是<queue>，和普通队列一样，定义的时候类型写成priority_queue<type> name;
++ 优先队列没有front和back函数，只能通过top()访问优先级最高的队首元素
+
+priority_queue常用函数
+
+push，top，pop，empty，size
+
+**优先队列中的优先级设置**
+
++ 如果是基本数据类型int；double；char，定义的时候写全参数priority_queue<int,vector<int>,greater<int> > q;三个参数的类型保持一致，最后一个参数less表示大的优先级高（在队首），greater表示小的优先级高
++ 对于结构体的话，要重载小于号进行比较
+```c
+struct fruit {
+    string name;
+    int price;
+
+    friend bool operator<(fruit f1, fruit f2) {
+        return f1.price < f2.price;
+    }
+
+};
+```
+
+然后正常定义就是按照默认大的在前面了
+如果想让小的在前面，就把返回值里的小于号改成大于号
+
+可以发现这种定义的逻辑和sort中的cmp函数逻辑正好相反，但是形式上却类似
+其实也可以放到结构体之外定义，更加类似cmp函数
+
+```c
+struct cmp {
+    bool  operator()(fruit f1,fruit f2) {
+        return f1.price > f2.price;
+    }
+};
+//此时定义方式必须是第三个参数写cmp
+priority_queue<fruit,vector<fruit>,cmp> q;
+```
+
+第二种定义优先级的方式其实是通用的方式，一般数据类型以及STL容器都可以使用这种方式来定义
+
+priority_queue经常用来解决贪心问题以及地杰斯特拉算法的优化等
+
+### stack
++ 栈：后进先出
++ 定义头文件等按照STL一般规律
++ 访问元素同queue，只能top
+
+常用函数
+push，pop，top，size，empty正常操作
+常见用途
+
+多用来实现递归
+
+### pair
++ 内部有两个元素的结构体
++ 头文件<utility>，或者导入map头文件时会自动导入涉及pair的部分
++ 定义pair<type1,type2> name;类似map，但是这两个是并列的关系，初始化的话直接跟着小括号了；里面赋值就可以
+pair<string,int> p("hhh",2);
++ 如果想在代码中临时构建一个pair，（比如用来赋值给变量）有两种方法
+第一种直接在类型后面赋值pair<type1,type2>("sddd",111)
+
+第二种使用make_pair("adff",111)
+
++ pair的访问就是同结构体，第一个元素是first，第二个元素是second
+```c
+#include <stdio.h>
+#include <utility>
+#include <iostream>
+
+using namespace std;
+int main() {
+    pair<string, int> p;
+    p = make_pair("hhhhh", 121312);
+    p.first = "ferge";
+    p.second = 334342;
+    p = pair<string, int>("jkjjj", 345);
+}
+```
+
+
+pair常用函数解析
++ 可以直接用比较运算符> < == <= >=等等比较，首先比较first的大小，若想等继续比较second
+
+pair常见用处
++ 替换只有两个元素的结构体，节约时间
++ map传值的时候经常用来构建pair传入，比如
+
+
+```c
+map<string,int> mp;
+
+mp.insert(make_pair("hhh", 342));
+```
 
 
