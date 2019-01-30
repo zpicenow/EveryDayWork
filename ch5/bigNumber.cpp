@@ -18,7 +18,7 @@ struct bigN {
 
     bigN() {
         memset(d, 1000, sizeof(d));
-        len = 0
+        len = 0;
     }
 };
 

@@ -1740,4 +1740,187 @@ map<string,int> mp;
 mp.insert(make_pair("hhh", 342));
 ```
 
+# 2019年01月30日打卡
+
+### algorithm头文件中的函数
+
+记得加using namespace std
++ max(),min(),参数是两个浮点数可以嵌套使用，这样就可以求多个数的最大小值
++ abs(int),绝对值，参数必须是整数，如果是浮点数只能用math头文件下面的fabs()
++ swap(T a,T b),交换两个相同类型的值，
++ reverse(a,b)可以将数组指针或者容器迭代器之间的元素翻转，比如对于数组a\[10],reverse(a,a+10),或者容器reverse(it1,it2),比如reverse(str.begin(),str.end())
++ next_permutation() :给出一个序列在全排列中的下一个序列，比如123下一个就是132，如果已经到达末尾，会返回false，因此可以用这个函数求全排列
+
+```c
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+int main() {
+    int a[10] = {1, 2, 3};
+    do {
+
+        printf("%d%d%d\n", a[0], a[1], a[2]);
+    } while (next_permutation(a, a + 3));
+}
+```
+
+这里传入了两个迭代器用于更新数组中的值
+
++ fill(): fill可以把数组或者容器中的任意一段区间元素赋为相同的值，和memset不同，fill可以是任意值不容易出现差错fill(a,b,x)将迭代器a到b之间全赋值为x
++ sort在前文展开过，不做赘述
++ lower_bound()和upper_bound()，在前文涉及过实现，而在algorithm中有成型的函数
+lower_bound(first,last,val)用来寻找在数组或容器内的first到last（左开右闭）范围内第一个值大于等于val的指针或迭代器
+upper_bound(first,last,val)用来寻找在数组或容器内的first到last（左开右闭）范围内第一个值大于val的指针或迭代器
+如果没有符合元素则返回可插入val的位置
+
+```c
+/*
+ * lower_bound()
+ * upper_bound()
+ */
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+int main() {
+    int a[10] = {1, 2, 2, 3, 3, 3, 5, 5, 5, 5};
+    printf("%d,%d\n", lower_bound(a, a + 10, -1)-a, upper_bound(a, a + 10, -1)-a);
+    printf("%d,%d\n", lower_bound(a, a + 10, 1)-a, upper_bound(a, a + 10, 1)-a);
+    printf("%d,%d\n", lower_bound(a, a + 10, 3)-a, upper_bound(a, a + 10, 3)-a);
+    printf("%d,%d\n", lower_bound(a, a + 10, 4)-a, upper_bound(a, a + 10, 4)-a);
+    printf("%d,%d", lower_bound(a, a + 10, 6)-a, upper_bound(a, a + 10, 6)-a);
+}
+```
+
+# 数据结构专题
+
+## 栈的应用
+
+STL中没有定义栈的清空，所以可以用当empty为false是一直循环pop
+
+### 中缀转后缀
+
++ 设立一个操作符栈，用来临时存放操作符，设立一个数组或者队列，用来存放后缀表达式
++ 从左到右扫描中缀表达式，遇到操作数就一位一位读入，合并后加入到后缀表达式
++ 如果遇到操作符op，同栈顶的操作符比较，如果优先级高则压栈，否则弹出，加入到后缀表达式中
++ 重复上述操作，直到扫描完中缀表达式，如果栈中还有元素，依次弹栈加入到后缀表达式
+
+所谓操作符的优先级即他们计算的优先级，乘==除 > 加==减，可以用map设定好
+
+### 计算后缀表达式
+
+从左到右扫描后缀表大会，如果是操作数，则压栈，如果是操作符，则连续弹出两个操作数进行计算，先弹出的是第二操作数，后弹出的是第一操作数
+
+**注意**
++ 操作数要定义成浮点型
++ 用string的erase可以去除表达式中无用的空白符
++ 注意题目要求表达式是否合法
+
+```c
+/*
+ * 四则运算计算器
+ */
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include <stack>
+#include <queue>
+#include <map>
+
+using namespace std;
+
+struct node {
+    double num;
+    char op;
+    bool flag;  //true表示操作数num，false表示操作符op
+
+};
+
+string str;
+stack<node> s;
+queue<node> q;
+map<char, int> op;
+
+//中缀转后缀
+void change() {
+    double num;
+    node temp;
+    for (int i = 0; i < str.length();) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            temp.flag = true;
+            temp.num = str[i++] - '0';
+            while (i < str.length() && str[i] >= '0' && str[i] <= '9') {
+                temp.num = temp.num * 10 + (str[i] - '0');
+                i++;
+            }
+            q.push(temp);
+        } else {
+            temp.flag = false;
+            while (!s.empty() && op[str[i]] <= op[s.top().op]) {
+                q.push(s.top());
+                s.pop();
+            }
+            temp.op = str[i];
+            s.push(temp);
+            i++;
+        }
+    }
+    while (!s.empty()) {
+        q.push(s.top());
+        s.pop();
+    }
+}
+
+//计算后缀表达式
+double cal() {
+    double temp1, temp2;
+    node cur,temp;
+    while (!q.empty()) {
+        cur = q.front();
+        q.pop();
+        if (cur.flag == true) {
+            s.push(cur);
+
+        } else {
+            temp2 = s.top().num;
+            s.pop();
+            temp1 = s.top().num;
+            s.pop();
+            temp.flag = true;
+            if (cur.op == '+') temp.num = (temp1 + temp2);
+            else if (cur.op == '-')  temp.num = (temp1 - temp2);
+            else if (cur.op == '*') temp.num = (temp1 * temp2);
+            else temp.num = (temp1 / temp2);
+            s.push(temp);
+        }
+    }
+    return s.top().num;
+
+}
+
+int main() {
+    op['+'] = op['-'] = 1;
+    op['*'] = op['/'] = 2;
+    while (getline(cin, str), str != "0") {
+        for (string::iterator it = str.end(); it != str.begin(); --it) {
+            if (*it == ' ') {
+                str.erase(it);
+            }
+
+        }
+        while (!s.empty()) {
+            s.pop();
+
+        }
+        change();
+        printf("%.2f\n", cal());
+    }
+    return 0;
+}
+```
+
+
+
+
 
