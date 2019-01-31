@@ -1921,6 +1921,193 @@ int main() {
 ```
 
 
+# 2019年01月31日打卡
+
+今天一个项目被甲方查水表了嘤嘤嘤
+
+## 队列的应用
+
+同样STL中的队列没有提供清空的函数
+因此可参照上文提到的清空栈的方法
+在while中判断empty不为真就一直pop
+上文的四则运算也涉及到了队列，也没什么要展开的
+
+## 链表
+
+链表同数组一样都是一种线性表，只不过顺序表的储存是连续的，链表的储存是不连续的
+链表可以分为带头节点和不带头结点两类，每个节点一般有数据域和指针域
+
+### 使用malloc和new为链表节点分配内存空间
+malloc是C语言stdlib.h头文件下的内存分配函数，返回申请的指针
+```c
+node*p = (node*)malloc(sizeof(node));
+```
+
+如果用malloc申请较大的动态数组就会申请失败返回NULL
+
+new是C++中申请动态空间的，形式要比malloc简单很多
+```c
+node *p = new node;
+```
+
+和malloc类似，如果用new开辟大量的空间，也会失败，但是会由C++中的异常管理机制处理，而不会返回NULL
+
+### 内存泄漏
+C、C++中没有动态内存管理机制，内存的申请和释放都要由程序员来完成
+如果申请的内存没有及时释放，就会导致内存泄漏
+
+C语言中对应malloc的释放函数是free，释放指针变量p： free（p）
+C++中对应new的释放函数是delete，用法类似：delete(p)
+### 链表操作
+
++ 创建链表
+```c
+/*
+ * 链表
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    node *next;
+
+};
+
+
+node *create(int Array[]) {
+    node *p, *pre, *head;
+    head = new node;
+    head->next = nullptr;
+    pre = head;
+    for (int i = 0; i < 5; ++i) {
+
+        p = new node;
+        p->data = Array[i];
+        p->next = nullptr;
+        pre->next = p;
+        pre = p;
+    }
+
+    return head;
+
+
+}
+```
+
++ 查找元素
+
+```c
+//查找元素
+int search(node *head, int x) {
+    int count = 0;
+    node *p = head->next;
+    while (p != nullptr) {
+        if (p.data == x) {
+            count++;
+        }
+        p = p->next;
+    }
+    return count;
+}
+```
+
++ 插入元素
+
+```c
+//插入元素
+void insert(node *head, int pos, int x) {
+    node *p = head;
+    for (int i = 0; i < pos - 1; ++i) {
+        p = p->next;
+    }
+    node *q = new node;
+    q->data = x;
+    q->next = p->next;
+    p->next = q;
+
+}
+```
+
++ 删除元素
+
+```c
+//删除元素
+void del(node *head, int x) {
+    node *p = head->next;
+    node *pre = head;
+    while (p != nullptr) {
+        if (p.data == x) {
+            pre->next = p->next;
+            delete (p);
+            p = pre->next;
+        } else {
+            pre = p;
+            p = p->next;
+        }
+    }
+}
+```
+
+### 静态链表
+
+静态链表的实现原理是hash，静态链表用整数来储存元素的地址，而不是用指针
+
+PAT A1032
+
+给出两个链表的首地址及若干节点地址、数据、下一个节点地址，求两条链表首个公用节点的位置若没有则输出-1
+
+```c
+/*
+ * PAT A 1032
+ */
+
+#include <stdio.h>
+#include <cstring>
+
+const int maxn = 100010;
+struct NODE {
+    char data;
+    int next;
+    bool flag;
+} node[maxn];
+
+int main() {
+    for (int i = 0; i < maxn; ++i) {
+        node[i].flag = false;
+    }
+    int s1, s2, n;
+    scanf("%d %d %d", &s1, &s2, &n);
+    int address, next;
+    char data;
+    for (int j = 0; j < n; ++j) {
+        scanf("%d %c %d", &address, &data, &next);
+        node[address].data = data;
+        node[address].next = next;
+    }
+    int p;
+    for (p = s1; p != -1; p = node[p].next) {
+        node[p].flag = true;
+    }
+    for (p = s2; p != -1; p = node[p].next) {
+        if (node[p].flag) {
+            break;
+        }
+
+    }
+    if (p != -1) {
+        printf("%05d\n", p);
+    } else {
+        printf("-1\n");
+    }
+    return 0;
+}
+```
+
+
+
+
 
 
 

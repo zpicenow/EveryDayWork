@@ -83,22 +83,22 @@ double cal() {
 
 }
 
-int main() {
-    op['+'] = op['-'] = 1;
-    op['*'] = op['/'] = 2;
-    while (getline(cin, str), str != "0") {
-        for (string::iterator it = str.end(); it != str.begin(); --it) {
-            if (*it == ' ') {
-                str.erase(it);
-            }
-
-        }
-        while (!s.empty()) {
-            s.pop();
-
-        }
-        change();
-        printf("%.2f\n", cal());
-    }
-    return 0;
-}
+//int main() {
+//    op['+'] = op['-'] = 1;
+//    op['*'] = op['/'] = 2;
+//    while (getline(cin, str), str != "0") {
+//        for (string::iterator it = str.end(); it != str.begin(); --it) {
+//            if (*it == ' ') {
+//                str.erase(it);
+//            }
+//
+//        }
+//        while (!s.empty()) {
+//            s.pop();
+//
+//        }
+//        change();
+//        printf("%.2f\n", cal());
+//    }
+//    return 0;
+//}
