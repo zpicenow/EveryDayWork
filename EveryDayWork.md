@@ -2106,6 +2106,99 @@ int main() {
 ```
 
 
+# 2019年02月01日打卡
+
+> 我承认今天划水了
+
+应用静态链表解题的一般步骤
++ 定义静态链表
+```c
+struct Node{
+    int address;
+    type data;
+    int next;
+    XXX; //节点的某个性质
+}node[100010];
+```
+
++ 在程序的开始，对静态链表进行初始化，一般来讲对XXX进行初始化为正常情况下到达不了的数字
+
++ 题目一般会给出首地址，然后我们从首地址开始遍历，得到整条链表，在此过程中同步对XXX进行标记
++ 由于静态链表直接使用hash映射，因此不连续，可以通过地址排序筛出有效的节点并放在数组左边，就需要cmp函数里面二级排序等
+
+PAT A 1052
+
+给定n个节点地址数据指针域等等，要求按照数据从小到大排序输出
+
+```c
+/*
+ * PAT A 1053
+ *
+ */
+
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+const int maxn = 100005;
+struct Node {
+    int address, data, next;
+    bool flag;
+} node[maxn];
+
+bool cmp(Node a, Node b) {
+    if (!a.flag || !b.flag) {
+        return a.flag > b.flag;
+    } else {
+        return a.data < b.data;
+    }
+}
+
+int main() {
+    for (int i = 0; i < maxn; ++i) {
+        node[i].flag = false;
+    }
+    int n, begin, address;
+    scanf("%d%d", &n, &begin);
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &address);
+        scanf("%d%d", &node[address].data, &node[address].next);
+        node[address].address = address;
+    }
+
+    int count = 0, p = begin;
+    while (p != -1) {
+        node[p].flag = true;
+        count++;
+        p = node[p].next;
+
+    }
+    if (count == 0) {
+        printf("0 -1");
+    } else {
+        sort(node, node + maxn, cmp);
+        printf("%d %05d\n", count, node[0].address);
+        for (int i = 0; i < count; ++i) {
+            if (i != count - 1) {
+                printf("%05d %d %05d", node[i].address, node[i].data, node[i + 1].address);
+
+            } else {
+                printf("%05d %d -1\n", node[i].address, node[i].data);
+
+            }
+        }
+    }
+    return 0;
+
+}
+
+```
+
+
+注意点
++ 直接使用%05d输出，不足在高位补零，但是要留意负数的输出
++ 可能会出现无效节点
++ 数据还可能存在无效情况，要注意判断
 
 
 
