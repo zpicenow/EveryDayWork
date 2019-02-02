@@ -2201,6 +2201,83 @@ int main() {
 + 数据还可能存在无效情况，要注意判断
 
 
+# 2019年02月02日打卡
+
+> 过年这几天有点划水，年后补回来
+
+### 深度优先搜索DFS
+
+深度优先搜索是一种枚举所有完整路径以遍历所有情况的搜索方法
+深度优先搜索和进出站的过程类似
+因此我们显然可以想到用栈来实现深度优先搜索
+深度优先搜索用递归的方法很好实现
+现在我们用深度优先搜索来理解一下求解斐波那契数列的过程
+F(n) = F(n-1) + F(n-2)
+可以将F(n-1) 和 F(n-2)视为两个岔路口，由它可以到达两个新的节点
+既然有岔路口，就存在死胡同，F(0) 与F(1)就是死胡同
+到达死胡同之后再依次返回，这就是一种深度优先搜索，直到找到我们想要的出口，也就是代求的结果
+举个例子
+> 有n件物品，每件物品的重量为w(i)，价值为c(i)，现在需要选出若干件物品放入容积为V的背包内，使得总价值最大
+
+在这个问题中，每个物品有放入或者不放入两个选择，这个就是一种岔路，而死胡同就是物品超重，需要返回最近的岔路口
+
+```c
+/*
+ * 有n件物品，每件物品的重量为w(i)，价值为c(i)，现在需要选出若干件物品放入容积为V的背包内，使得总价值最大
+ */
+
+#include <stdio.h>
+
+const int maxn = 30;
+int n, V, maxValue = 0;
+int w[maxn], c[maxn];
+void DFS(int index,int sumW,int sumC) {
+    if (index == n) {
+        if (sumW <= V && sumC > maxValue) {
+            maxValue = sumC;
+        }
+        return;
+    }
+    DFS(index + 1, sumW, sumC);
+    DFS(index + 1, sumW + w[index], sumC + c[index]);
+}
+int main(){
+    scanf("%d%d", &n, &V);
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &w[i]);
+    }
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &c[i]);
+    }
+    DFS(0, 0, 0);
+    printf("%d\n", maxValue);
+    return 0;
+}
+```
+
+可以发现算法复杂度很高，因此可以根据背包的容积来增加条件减少无用操作
+
+```c
+//优化后
+void DFS1(int index,int sumW,int sumC) {
+    if (index == n) {
+        return;
+
+    }
+    DFS1(index + 1, sumW, sumC);
+    if (sumW + w[index] <= V) {
+        if (sumC + c[index] > maxValue) {
+            maxValue = sumC + c[index];
+        }
+        DFS1(index + 1, sumW + w[index], sumC + c[index]);
+    }
+}
+```
+
+这种根据题目的限制减少DNF复杂度的过程称为**剪枝**
+显然上述问题也等价于从给定的N个整数中选出K个整数的所有（最优）方法
+
+
 
 
 
