@@ -2278,6 +2278,203 @@ void DFS1(int index,int sumW,int sumC) {
 显然上述问题也等价于从给定的N个整数中选出K个整数的所有（最优）方法
 
 
+# 2019年02月03日打卡
 
+### 广度优先搜索BFS
+
+广度优先搜索按照同一层次的先后顺序遍历
+因此在过程上类似与队列，非递归形式可以用队列实现
+
+一般过程
++ 首先定义队列Q，并将起点s入队列
++ 通过while循环判断队列是否为空
++ 在while循环中取出队首元素top，然后访问（这个访问可以泛指任何操作），访问完后将其出队列
++ 将top下一层节点中所有未曾入队的节点入队，并标记它们的层号为now的层号加一
++ 返回第二步继续循环
+
+> 给出一个m*n的矩阵，矩阵中的元素为0或1，称位置(x,y)与其上下左右四个位置(x,y+1),(x-1,y),(x+1,y),(x,y-1)是相邻的，如果矩阵中有若干个1是相邻的，不必两两相邻，那么称这些1构成了一个块，求给定矩阵中块的个数
+
+0111001
+
+0010000
+
+0000100
+
+0001110
+
+1110100
+
+1111000
+
+
+例如上面的矩阵中，块的个数是4
+对于这个问题，求解的基本思想是，枚举每一个元素的位置，如果是0，则跳过，如果是1，则使用BFS查询与该位置相邻的四个元素，前提是不出界
+直到周围的1访问完毕
+为了防止走回头路，可以设置一个bool型数组，来记录每个元素的位置
+一个小技巧是，设置两个增量数组，这样就可以利用for循环来枚举四个方向
+
+```c
+/*
+ * 给出一个m*n的矩阵，矩阵中的元素为0或1，称位置(x,y)与其上下左右四个位置(x,y+1),(x-1,y),(x+1,y),(x,y-1)是相邻的，块的个数
+ * 如果矩阵中有若干个1是相邻的，不必两两相邻，那么称这些1构成了一个块，求给定矩阵中
+ */
+
+#include <stdio.h>
+#include <queue>
+
+using namespace std;
+const int maxn = 100;
+
+struct node {
+    int x, y;
+} Node;
+
+int n, m;
+int matrix[maxn][maxn];
+bool inq[maxn][maxn] = {false};
+int X[4] = {0, 0, 1 - 1};
+int Y[4] = {1, -1, 0, 0};
+
+bool judge(int x, int y) {
+    if (x >= n || x < 0 || y >= m || y < 0) {
+        return false;
+    }
+    if (matrix[x][y] == 0 || inq[x][y]) {
+        return false;
+    }
+    return true;
+}
+
+void BFS(int x, int y) {
+    queue<node> Q;
+    Node.x = x;
+    Node.y = y;
+    Q.push(Node);
+    inq[x][y] = true;
+    while (!Q.empty()) {
+        node top = Q.front();
+        Q.pop();
+        for (int i = 0; i < 4; ++i) {
+            int newX = top.x + X[i];
+            int newY = top.y + Y[i];
+            if (judge(newX, newY)) {
+                Node.x = newX, Node.y = newY;
+                Q.push(Node);
+                inq[newX][newY] = true;
+
+            }
+        }
+    }
+}
+
+int main() {
+    scanf("%d%d", &n, &m);
+    for (int x = 0; x < n; ++x) {
+        for (int y = 0; y < n; ++y) {
+            scanf("%d", &matrix[x][y]);
+
+        }
+    }
+    int ans = 0;
+    for (int x = 0; x < n; ++x) {
+        for (int y = 0; y < n; ++y) {
+            if (matrix[x][y] == 1 && !inq[x][y]) {
+                ans++;
+                BFS(x, y);
+            }
+        }
+    }
+    printf("%d\n", ans);
+    return 0;
+
+}
+
+```
+
+再来看下一个例子
+> 给定一个大小为n*m的迷宫，其中*代表不可通过的墙壁，点代表平地，S表示起点，T表示终点，每次只能上下左右移动一步，求起点到终点的最小步数
+
+```c
+/*
+ *
+ * 给定一个大小为n*m的迷宫，其中*代表不可通过的墙壁，点代表平地，S表示起点，T表示终点，每次只能上下左右移动一步，求起点到终点的最小步数
+ */
+#include <stdio.h>
+#include <cstring>
+#include <queue>
+
+using namespace std;
+const int maxn = 100;
+struct node {
+    int x, y;
+    int step;
+} S, T, Node;
+
+int n, m;
+char maze[maxn][maxn];
+bool inq[maxn][maxn] = {false};
+int X[4] = {0, 0, 1, -1};
+int Y[4] = {1, -1, 0, 0};
+
+bool test(int x, int y) {
+    if (x >= n || x < 0 || y >= m || y < 0) {
+        return false;
+    }
+    if (maze[x][y] == '*') {
+        return false;
+    }
+    if (inq[x][y]) {
+        return false;
+    }
+    return true;
+}
+
+int BFS() {
+    queue<node> q;
+    q.push(S);
+    while (!q.empty()) {
+        node top = q.front();
+        q.pop();
+        if (top.x == T.x && top.y == T.y) {
+            return top.step;
+        }
+        for (int i = 0; i < 4; ++i) {
+            int newX = top.x;
+            int newY = top.y;
+            if (test(newX, newY)) {
+                Node.x = newX;
+                Node.y = newY;
+                Node.step = top.step + 1;
+                q.push(Node);
+                inq[newX][newY] = true;
+
+            }
+        }
+    }
+    return -1;
+}
+
+int main() {
+    scanf("%d%d", &n,&m);
+    for (int i = 0; i < n; ++i) {
+        getchar();
+        for (int j = 0; j < m; ++j) {
+            maze[i][j] = getchar();
+        }
+        maze[i][m + 1] = '\0';
+    }
+    scanf("%d%d%d%d", &S.x, &S.y, &T.x, &T.y);
+    S.step = 0;
+    printf("%d\n", BFS());
+    return 0;
+}
+
+```
+
+inq数组是判断节点是否入队列，而不是判断节点是否被访问
+push操作只是将副本入容器，不能直接修改，比如对于数组a\[],push（a【0】）后，a.front = xx并不影响原数组中的值
+
+因此有些场所可以直接传入数组的下标
+注意应用
 
 
