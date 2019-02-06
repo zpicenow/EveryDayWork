@@ -2477,4 +2477,67 @@ push操作只是将副本入容器，不能直接修改，比如对于数组a\[]
 因此有些场所可以直接传入数组的下标
 注意应用
 
+# 2019年02月04日
+辞旧迎新！除夕快乐！
+
+# 2019年02月05日
+恭贺新禧！新年快乐！
+诸事顺心！永无bug！
+
+# 2019年02月06日打卡
+
+# 树
+
++ 结点，边
++ 空树 ： 没有结点的树
++ 树的层次 ： 从根节点算起的层次，一般认为根节点是一层，具体看要求
++ 度 ： 节点的子节点个数
++ 有n个结点的树一定有n-1个边
++ 叶子结点被定义为度数为0的结点，即没有子结点
++ 结点的深度是从根结点出发的层次，结点的高度是从叶子结点出发的层次
++ 森林是多棵树组成
+
++ 满二叉树： 每一层的结点都达到了最大值，就是叶子结点全在最下一层
++ 完全二叉树： 除了最下面一层外，剩下的层数都达到了最大值
+
++ 孩子节点，父亲节垫，兄弟节点，祖先节点
+
+## 二叉树的储存结构
+```c
+struct node{
+    type date;
+    node* lchild;
+    node* rchild;
+};
+node* root = NULL;
+```
+
+### 新建结点
+```c
+node* newNode(int v){
+    node* Node = new node;
+    Node->date = v;
+    Node->lchild = NULL;
+    Node->right = NULL;
+    return Node;
+};
+```
+
+### 二叉树结点的查找、修改
+
+```c
+void search(node* root,int x,int newDate){
+    if(root == NULL){
+        return;
+    }
+    if(root-> date == x){
+        root->date = newDate;
+    }
+    search(root->lchild,x,newDate);
+    search(root->rchild,x,newDate);
+}
+```
+
+### 插入
+
 
