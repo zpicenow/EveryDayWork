@@ -2538,6 +2538,146 @@ void search(node* root,int x,int newDate){
 }
 ```
 
-### 插入
+# 2019年02月14日打卡
 
+### 插入
+```c
+//注意根节点root要使用引用
+void insert(node* &root,int x){
+    if(root == NULL){
+        root = new Node(x);
+        return;
+    }
+    if(由二叉树的性质得知x应该在左子树){
+        insert(root->lchild,x);
+    }else{
+        insert(root->rchild,x);
+    }
+}
+```
+
+如果在函数中需要对树结构作出修改那么就要使用引用，如果只是修改当前已有的节点内容或者遍历就不用
+
+### 创建
+二叉树的创建过程就是根据题目所给出的数据执行插入函数的过程
+
+### 完全二叉树的储存结构
+对于完全二叉树来说，除了可以用二叉链表储存外还可以用数组来储存
+
+通过观察可以发现一个规律，对完全二叉树中任意的结点x，他的左子树一定是2x，右子树一定是2x+1，且根节点储存在1号位，不能是0号位
+对于高度是k的完全二叉树，其数组大小为二的k次方，其实对于非完全二叉树也可以采用这种储存方式然后把没有数据的结点位置置为特殊值，但是这样可能会造成极大的浪费
+除此之外，该数组中元素存放的顺序恰好就是层次遍历的顺序，而判断某个节点是否为叶子结点只需要判断该节点的左子树编号的二倍是否大于总结点数n，大于即是叶子结点
+
+## 二叉树的遍历
+
+二叉树的遍历是按一定顺序访问所有节点
+有先序，中序，后序，层次遍历四种
+对于前三种分别是根左右，左根右，左右根，
+
+### 先序遍历
+```c
+void preorder(node* root) {
+    if (root == NULL) {
+        return;
+
+    }
+    printf("%d\n", root);
+    preorder(root->lchild);
+    preorder(root->rchild);
+}
+```
+
+先序遍历根节点一定是序列第一个
+
+### 中序遍历
+```c
+void inorder(node* root) {
+    if (root == NULL) {
+        return;
+
+    }
+    inorder(root->lchild);
+    printf("%d\n", root->date);
+    inorder(root->rchild);
+}
+```
+
+可以看出使用递归方法实现的遍历，只需要按照要求的顺序
+中序遍历的左右子树一定分列在根节点的两侧，所以知道根节点可以很容易地区分左右部分
+
+### 后序遍历
+```c
+void postorder(node* root) {
+    if (root == NULL) {
+        return;
+
+    }
+    inorder(root->lchild);
+    inorder(root->rchild);
+    printf("%d\n", root->date);
+}
+```
+
+后序遍历根节点一定在最末尾
+
+只要知道中序遍历结果和先序后序任意一种，才可以唯一地确定一棵树
+### 层次遍历
+层次遍历类似于BFS
+一般思路是
++ 将根节点root加入队列
++ 取出队首节点并访问
++ 如果有将左孩子入队列
++ 如果有将右孩子入队列
++ 返回第二步直到队列为空
+
+
+
+```c
+void Layerorder(node* root) {
+    queue<node *> q;
+    q.push(root);
+    while (!q.empty()) {
+        node *now = q.front();
+        q.pop();
+        printf("%d", now->date);
+        if (now->lchild != NULL) {
+            q.push(now->lchild);
+        }
+        if (now->rchild != NULL) {
+            q.push(now->rchild);
+        }
+    }
+}
+```
+
+如果需要输出层次，就在结构体内添加一个记录层次的数据，然后在函数中厨师根节点层层次为1，每次左右子树入队列时，将左右子树的层数变量+1
+
+### 二叉树的重建
+给出先序和中序遍历，重构二叉树
+```c
+//当前先序遍历区间【preL,preR】,中序序列区间【inL，inR】
+
+int pre[10010];
+int in[10010];
+node* create(int preL,int preR,int inL,int inR) {
+
+    if (preL > preR) {
+        return NULL;
+
+    }
+    node *root = new node;
+    root->date = pre[preL];
+    int k;
+    for (k = inL; k <= inR; ++k) {
+        if (in[k] == pre[preL]) {
+            break;
+        }
+    }
+    int numLeft = k - inL;
+    root->lchild = create(preL + 1, preL + numLeft, inL, k - 1);
+    root->rchild = create(preL + numLeft + 1, preR, k + 1, inR);
+    return root;
+
+}
+```
 
