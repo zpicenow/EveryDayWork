@@ -12,6 +12,13 @@ struct node{
     node* lchild;
     node* rchild;
 };
+node* newNode(int x) {
+    node* Node = new node;
+    Node->date = x;
+    Node->lchild = NULL;
+    Node->rchild = NULL;
+    return Node;
+}
 void preorder(node* root) {
     if (root == NULL) {
         return;

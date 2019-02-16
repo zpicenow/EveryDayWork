@@ -2766,3 +2766,121 @@ int main() {
 }
 ```
 
+# 2019年02月16日打卡
+
+## 二叉查找树
+二叉查找树是一种特殊的二叉树，又称为排序二叉树，二叉搜索树，其定义如下：
+> 二叉查找树要么是一颗空树，要么是由根节点，左子树，右子树三部分组成，且左右子树均为二叉搜索树，左子树上所有的数据域均小于或等于右子树
+
+二叉搜索树就是一棵左根右数据严格有序（非降序）的二叉树
+
+### 二叉搜索树的查找
+既然二叉搜索树的接点是严格有序的，所以查找是类似二分法的思想，如果结点大于待查找的数据，就向左递归，否则就向右递归
+
+```c
+void search(node* root,int x) {
+    if (root == NULL) {
+        printf("fail");
+        return;
+    }
+    if (x == root->date) {
+        printf("%d", root->date);
+
+    } else if (x < root->date) {
+        search(root->lchild,x);
+    } else {
+        search(root->rchild, x);
+    }
+}
+```
+
+### 插入
+
+```c
+void insert(node* root,int x) {
+    if (root == NULL) {
+        root = newNode(x);
+        return;
+    }
+    if (x == root->date) {
+        return;
+    } else if (x < root->date) {
+        insert(root->lchild, x);
+    } else {
+        insert(root->rchild, x);
+    }
+
+}
+```
+
+当查找失败时，创建该机诶单
+
+### 创建
+```c
+node * create(int date[],int n) {
+    node *root = NULL;
+    for (int i = 0; i < n; ++i) {
+        insert(root, date[i]);
+    }
+    return root;
+}
+```
+
+注意：不同插入顺序创建出来的二叉树不同
+### 删除结点
+举个例子，如果要删除5这个节点，要用比5小的最大节点a替换，然后删掉a，或者用比5大的最小值b替换，然后删掉b
+其中类似a称之为5这个节点的前驱，类似b称之为5这个节点的后继
+显然前驱是该节点左子树的最右结点，后继是该节点右子树的最左结点
+
+```c
+//寻找以root为根的树中最大节点
+node *findMAX(node *root) {
+    while (root->rchild != NULL) {
+        root = root->rchild;
+    }
+    return root;
+}
+
+//寻找以root为根的树中最小节点
+node *findMIN(node *root) {
+    while (root->lchild != NULL) {
+        root = root->lchild;
+    }
+    return root;
+}
+```
+
+删除操作的基本思路如下：
++ 如果root为空，说明不存在该权值
++ 如果root刚好为给定的权值，说明已经找到待删除的结点，此时进入删除阶段
+ + 如果当前结点不存在左右结点，说明是叶子结点，可以直接删除
+ + 如果存在左孩子，就寻找前驱，替换并删除前驱，
+ + 如果存在右孩子，就寻找后继，替换并删除
++ 如果root值大于权值，向左递归删除，否则向右递归删除
+
+```c
+void deleteNode(node *root, int x) {
+    if (root == NULL) {
+        return;
+
+    }
+    if (root->date == x) {
+        if (root->lchild == NULL && root->rchild == NULL) {
+            root = NULL;
+        } else if (root->lchild != NULL) {
+            node *pre = findMAX(root->lchild);
+            root->date = pre->date;
+            deleteNode(root->lchild, pre->date);
+        } else {
+            node *next = findMIN(root->rchild);
+            root->date = next->date;
+            deleteNode(root->rchild, next->date);
+        }
+    } else if (root->date > x) {
+        deleteNode(root->lchild, x);
+    } else {
+        deleteNode(root->rchild, x);
+    }
+}
+```
+二叉查找树的中序遍历结果是有序的
