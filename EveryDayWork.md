@@ -2884,3 +2884,250 @@ void deleteNode(node *root, int x) {
 }
 ```
 二叉查找树的中序遍历结果是有序的
+
+# 2019年02月17日打卡
+
+PAT Ａ　1043
+> A Binary Search Tree (BST) is recursively defined as a binary tree which has the following properties:
+  The left subtree of a node contains only nodes with keys less than the node's key.
+  The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+  Both the left and right subtrees must also be binary search trees.
+  If we swap the left and right subtrees of every node, then the resulting tree is called the Mirror Image of a BST.
+  Now given a sequence of integer keys, you are supposed to tell if it is the preorder traversal sequence of a BST or the mirror image of a BST.
+
+
+```c
+/*
+ * PAT A 1043
+ * A Binary Search Tree (BST) is recursively defined as a binary tree which has the following properties:
+ *  The left subtree of a node contains only nodes with keys less than the node's key.
+ *   The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+ *   Both the left and right subtrees must also be binary search trees.
+ * If we swap the left and right subtrees of every node, then the resulting tree is called the Mirror Image of a BST.
+ * Now given a sequence of integer keys, you are supposed to tell if it is the preorder traversal sequence of a BST or the mirror image of a BST.
+ */
+
+#include <stdio.h>
+#include <vector>
+
+using namespace std;
+struct node {
+    int data;
+    node *left, *right;
+};
+
+void insert(node *&root, int data) {
+    if (root == NULL) {
+        root = new node;
+        root->data = data;
+        root->left = root->right = NULL;
+        return;
+
+    }
+    if (data < root->data) {
+        insert(root->left, data);
+    } else {
+        insert(root->right, data);
+    }
+}
+
+void preOrder(node* root,vector<int>&vi) {
+    if (root == NULL) {
+        return;
+    }
+    vi.push_back(root->data);
+    preOrder(root->left, vi);
+    preOrder(root->right, vi);
+}
+
+void preOrderMirror(node*root,vector<int>&vi) {
+    if (root == NULL) {
+        return;
+    }
+    vi.push_back(root->data);
+    preOrderMirror(root->right, vi);
+    preOrderMirror(root->left, vi);
+}
+void postOrder(node* root,vector<int>&vi) {
+    if (root == NULL) {
+        return;
+    }
+    postOrder(root->left, vi);
+    postOrder(root->right, vi);
+    vi.push_back(root->data);
+}
+void postOrderMirror(node* root,vector<int> & vi) {
+    if (root == NULL) {
+        return;
+    }
+    postOrderMirror(root->right, vi);
+    postOrderMirror(root->left, vi);
+    vi.push_back(root->data);
+}
+
+vector<int> origin,pre,preM,post,postM;
+int main() {
+    int n,data;
+    node *root = NULL;
+    scanf("%d", &n);
+    for (int i = 0; i < n; ++i) {
+        scanf("%d", &data);
+        origin.push_back(data);
+        insert(root, data);
+    }
+    preOrder(root, pre);
+    preOrderMirror(root, preM);
+    postOrder(root, post);
+    postOrderMirror(root, postM);
+    if (origin == pre) {
+        printf("YES\n");
+        for (int i = 0; i < post.size(); ++i) {
+            printf("%d", post[i]);
+            if (i < post.size() - 1) {
+                printf(" ");
+            }
+        }
+    } else if (origin == preM) {
+        printf("YES\n");
+        for (int i = 0; i < postM.size(); ++i) {
+            printf("%d", postM[i]);
+            if (i < postM.size() - 1) {
+                printf(" ");
+            }
+        }
+    } else {
+        printf("NO\n");
+    }
+    return 0;
+}
+```
+
+## 平衡二叉树
+
+也称为AVL树，平衡二叉树是二叉搜索树，且对其任意结点，左子树和右子树的高度相差不超过1，其中左子树和右子树的高度差被称为平衡因子
+由于需要对每个节点都得到平衡因子，因此需要在树的结构中加入一个height的变量
+
+```c
+
+struct node{
+    int v,height;
+    node *lchild, *rchild;
+};
+
+node* newNode(int v) {
+    node* Node = new node;
+    Node->v = v;
+    Node->height = 1;
+    Node->lchild = Node->rchild = NULL;
+    return Node;
+}
+//得到结点高度
+int getHeight(node* root) {
+    if (root == NULL) {
+        return 0;
+
+    }
+    return root->height;
+}
+//得到节点平衡因子
+int getBalanceFactor(node* root) {
+    return getHeight(root->lchild) - getHeight(root->rchild);
+}
+
+void updateHeight(node *root) {
+    root->height = max(getHeight(root->lchild), getHeight(root->rchild)) + 1;
+}
+```
+
+### 查找
+
+方法与二叉搜索树相同，时间复杂度为logn
+
+```c
+void search(node* root,int x) {
+    if (root == NULL) {
+        printf("-1");
+        return;
+    }
+    if (x == root.v) {
+        printf("1");
+    } else if (x < root.v) {
+        search(root->lchild, x);
+    } else {
+        search(root->rchild, x);
+    }
+}
+```
+
+### 插入
+
+左旋
+```c
+void L(node* &root) {
+    node* temp = root->rchild;
+    root->rchild = temp->lchild;
+    temp->lchild = root;
+    updateHeight(root);
+    updateHeight(temp);
+    root = temp;
+}
+```
+
+右旋
+```c
+
+void R(node* &root) {
+    node *temp = root->lchild;
+    root->lchild = temp->rchild;
+    temp->rchild = root;
+    updateHeight(root);
+    updateHeight(temp);
+    root = temp;
+}
+```
+只要把最靠近失衡点的结点调整正常，路径上所有结点就都会平衡
+
+根据树型为LL型，RR，LR，RL分别进行右单旋，左单旋，左右双旋，右左双旋，而树型根据平衡因子判断
+
+汇总一下就是
++ 根节点因子为2，左孩子因子为1，此时为LL型，需要对根节点进行右旋，
++ 根节点为2，左孩子为-1，此时为LR型，需要先对左孩子进行左旋，在对根节点进行右旋
++ 根节点为-2,右孩子为-1,此时为RR型，需要对根节点进行左旋
++ 根节点为-2,右孩子为1,此时为RL型，需要对右孩子进行右旋，在对根节点进行左旋
+
+```c
+void insert(node* &root,int v) {
+    if (root == NULL) {
+        root = newNode(v);
+        return;
+    }
+    if (v < root->v) {
+        insert(root->lchild, v);
+        updateHeight(root);
+        if (getBalanceFactor(root) == 2) {
+            if (getBalanceFactor(root->lchild) == 1) {
+                R(root);
+            } else if (getBalanceFactor(root->lchild) == -1) {
+                L(root->lchild);
+                R(root);
+            }
+        }
+    } else {
+        insert(root->rchild, v);
+        updateHeight(root);
+        if (getBalanceFactor(root) == -2) {
+            if (getBalanceFactor(root->rchild) == -1) {
+                L(root);
+            } else if (getBalanceFactor(root->rchild) == 1) {
+                R(root->rchild);
+                L(root);
+            }
+        }
+    }
+}
+```
+
+### 删除
+对于删除，同样先用二叉搜索树的替换节点方法删除，然后再判断删除节点向上两个节点的平衡因子，再根据树型进行左右旋调整
+
+
