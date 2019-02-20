@@ -3174,6 +3174,63 @@ void Union(int a,int b) {
 }
 ```
 
+# 2019年02月20日打卡
+
+### 路径压缩
+
+上面讲述的并查集操作是最简单的思想，举个例子，如果给出的集合是一条链
+那么寻找父节点的过程计算量就非常大，所以要进行优化
+看下面四个节点
+
+father【1】 = 1；
+
+father【2】 = 2；
+
+father【3】 = 3；
+
+father【4】 = 4；
+
+如果只是想寻找父节点，直接把四个值全赋值成1即可
+
+此时树型从一条链变成了一把伞
+装换的过程可以概括为下面两个步骤
++ 按之前的方法获得x的根节点
++ 重新从x走一遍寻找根节点的过程，把路径上的每一个节点父节点赋值根节点
+```c
+int findFather(int x) {
+    int a = x;
+    while (x != father[x]) {
+        x = father[x];
+    }
+    while (a != father[a]) {
+        int z = a;
+        a = father[a];
+        father[z] = x;
+    }
+    return x;
+
+}
+```
+递归写法
+```c
+//递归
+int findFather(int x) {
+    if (x == father[x]) {
+        return x;
+    } else {
+        int F = findFather(father[x]);
+        father[x] = F;
+        return F;
+
+    }
+
+}
+```
+
+> 已知如果A和B是好朋友，等价于B和A是好朋友，如果A和C是好朋友，B和C也是好朋友，那么A和B也是好朋友。现给出一些人，问能够分成几组，使得每组之内两两都是好朋友，每组之间不存在好朋友
+
+
+
 
 
 
