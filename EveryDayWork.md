@@ -3289,6 +3289,152 @@ int main() {
 ```
 
 
+# 2019年02月21日打卡
+
+## 堆
+
+堆是一棵完全二叉树，父子节点有序，每个父节点的值不大于或者不小于自己诶单的值
++ 如果每个节点的值都是以根节点为子树的最大值，那么称为大顶堆，即根节点为整棵树的最大值
++ 相反，如果每个节点的值都是以根节点为子树的最小值，称之为小顶堆，即根节点是整棵树的最小值
+
+对于一个无序的完全二叉树，通常使用向下调整来有序化成一个堆，以构建大顶堆为例，思路为：
+总是将当前节点V与其左右孩子比较（如果有的话），如果孩子中存在大于结点V的，就与孩子结点交换位置，
+交换完之后，继续与孩子节点比较，重复这一过程
+
+结合之前的完全二叉树的储存方法，代码如下
+
+```c
+const int maxn = 100;
+int heap[maxn], n = 10;
+
+void downJust(int low,int high) {   //堆的数组范围[low,high]
+    int i = low, j = i * 2;
+    while (j <= high) {
+        if (j + 1 >= high && heap[j + 1] > heap[j]) {
+            j = j + 1;
+        }
+        if (heap[j] > heap[i]) {
+            swap(heap[i], heap[j]);
+            i = j;
+            j *= 2;
+        } else {
+            break;
+        }
+    }
+}
+
+void createHeap() {
+    for (int i = n / 2; i >= 0; --i) {
+        downAdjust(i, n);
+    }
+}
+```
+
++ 删除堆顶元素
+
+删除堆顶元素，需要先把堆尾的元素替换堆顶的元素，然后再一次向下调整到有序
+
+```c
+int top() {
+    int top = heap[0];
+    heap[0] = heap[n--];    //注意删除元素后个数减一
+    downAdjust(0, n);
+    return top;
+}
+```
+
++ 添加元素到末尾
+```c
+void upAdjust(int low ,int high) {
+    int i = high, j = high / 2;
+    while (j >= low) {
+        if (heap[j] < heap[i]) {
+            swap(heap[j], heap[i]);
+            i = j;
+            j /= 2;
+        } else {
+            break;
+        }
+    }
+}
+
+void insert(int x) {
+    heap[++n] = x;
+    upAdjust(0, n);
+}
+```
+
+### 堆排序
+
+```c
+void heapSort() {
+    createHeap();
+    for (int i = n; i > 0; --i) {
+        swap(heap[i], heap[0]);
+        downAdjust(0, i - 1);
+    }
+}
+```
+
+排序完成后heap数组即为有序数组
+
+## 哈夫曼树
+
+把节点的权值乘以路径长度称为带权路径长度，所有节点的带权路径长度称为树的带权路径长度（WPL）
+
+使得带权路径长度最小的树称为哈夫曼树;
+对同一组节点来说，哈夫曼树可能不唯一，但是树的最小带权路径长度一定唯一
+
+下面给出一个简洁的方法构造哈夫曼树：
++ 初始状态下只有n个节点，将他们视为n个只有一个结点的树
++ 合并其中根节点权值最小的两棵树，生成的父结点的权值为二者的和，这样树的数量就减少了一棵
++ 重复第二步，直至剩下惟一一棵树，得到哈夫曼树
+
+```c
+/*
+ * 哈夫曼树
+ */
+
+#include <cstdio>
+#include <queue>
+
+using namespace std;
+
+//代表小顶堆的优先队列
+
+priority_queue<long long, vector<long long>, greater<long long> > q;
+int main() {
+    int n;
+    long long temp, x, y, ans = 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; ++i) {
+        scanf("%lld", &temp);
+        q.push(temp);
+    }
+    while (q.size() > 1) {
+        x = q.top();
+        q.pop();
+        y = q.top();
+        q.pop();
+        q.push(x + y);
+        ans += x + y;
+
+    }
+    printf("%lld", ans);
+    return 0;
+}
+```
+
+### 哈夫曼编码
+
+**前缀编码**： 任何一个字符的编码都不会是其他字符的前缀
+
+将哈夫曼树中的所有左右子树分别标为0和1,，对于每个叶子节点的编号即为前缀编码
+
+哈夫曼树组成的前缀编码时能使01串最短的前缀编码，这种由哈夫曼树导出的前缀编码也称为哈夫曼编码
+
+
+
 
 
 
