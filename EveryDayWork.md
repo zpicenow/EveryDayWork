@@ -3499,7 +3499,51 @@ adj[1].push_back(Node(3,4));
 
 当节点数目较大，一般超过1000，就要用邻接表来储存
 
+# 2019年2月26日打卡  
 
+PAT B 1001  
+```c
+#include<stdio.h>
+int main(){
+    int n,ans = 0;
+    scanf("%d",&n);
+    while(n!=1){
+        if(n &1){
+            n = (3*n+1)/2;
+        }else{
+            n /=2;
+        }
+        ++ans;
+    }
+    printf("%d",ans);
+    return 0;
+}
+```   
+
+PAT B 1011  
+```c
+#include<stdio.h>
+int main(){
+    int n;
+    long long a,b,c;
+    bool re[15] = {0};
+    scanf("%d",&n);
+    for(int i = 1;i <= n;++i){
+        scanf("%ld%ld%ld",&a,&b,&c);
+        if(c-b < a){
+            re[i] = true;
+        }
+    }
+    for(int i = 1;i <= n;++i){
+        printf("Case #%d: ",i);
+        if(re[i]) printf("true");
+        else printf("false");
+        if(i < n) printf("\n");
+    }
+}
+```  
+
+注意int的范围是-2^31到2^31-1，相比于题目的刚好少了一个数，所以要用long long  
 
 
 
