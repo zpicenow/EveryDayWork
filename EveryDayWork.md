@@ -3545,6 +3545,68 @@ int main(){
 
 注意int的范围是-2^31到2^31-1，相比于题目的刚好少了一个数，所以要用long long  
 
+PAT B 1016  
+```c
+#include<stdio.h>
+int main(){
+  long long a,da,b,db,pa = 0,pb = 0;
+  scanf("%lld%lld%lld%lld",&a,&da,&b,&db);
+  while(a != 0){
+    if(a %10 == da){
+      pa = pa * 10 + da;
+    }
+    a /=10;
+  }
+  while(b != 0){
+    if(b %10 == db){
+      pb = pb * 10 + db;
+    }
+    b /= 10;
+  }
+  printf("%lld",pa + pb);
+  return 0;
+}
+```
 
+PAT B 1026  
+```c
+#include<stdio.h>
+int main(){
+    int a,b,c,h,min,s;
+    scanf("%d%d",&a,&b);
+    if((b-a)%100 >= 50)
+        c = (b-a)/100 + 1;
+    else c = (b-a) /100;
+    s = c%60;
+    min = c /60 % 60;
+    h = c / 3600 % 60;
+    printf("%02d:%02d:%02d",h,min,s);
+    return 0;
+}
+
+```  
+注意输出格式  
+
+PAT B 1046  
+```c
+#include<stdio.h>
+int main(){
+  int n,a,b,c,d,ans1 = 0,ans2 = 0;
+  scanf("%d",&n);
+  for(int i = 0;i < n;++i){
+    scanf("%d%d%d%d",&a,&b,&c,&d);
+    int re = a + c;
+    if(re == b && re != d){
+      ++ans2;
+    }else if(re != b && re == d){
+      ++ans1;
+    }else{
+      
+    }
+  }
+  printf("%d %d",ans1,ans2);
+  return 0;
+}
+```  
 
 
