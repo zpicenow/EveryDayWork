@@ -3609,4 +3609,80 @@ int main(){
 }
 ```  
 
+# 2019年2月28日打卡  
+
+PAT B 1008  
+```c
+#include<stdio.h>
+const int maxn = 110;
+int main(){
+  int n,m;
+  int arr[maxn];
+  scanf("%d%d",&n,&m);
+  m %= n;
+  for(int i = m;i<n;++i){
+    scanf("%d",&arr[i]);
+  }if(m != 0){
+    for(int i = 0;i<m;++i){
+    scanf("%d",&arr[i]);
+  }
+  }
+  
+  for(int i = 0;i < n; ++i){
+    printf("%d",arr[i]);
+    if(i < n-1) printf(" ");
+  }
+  return 0;
+  
+}
+```  
+本题注意m的范围没有上限，所以对n取模可以减少运算量  
+
+PAT B1012  
+
+```c
+#include<stdio.h>
+
+int main(){
+    int count[5] = {0};
+    int ans[5] = {0};
+    int temp;
+    int a2 = -1;
+    int n;
+    scanf("%d",&n);
+    for(int i = 0;i < n;++i){
+        scanf("%d",&temp);
+        if(temp %10 == 0){
+            ans[0] += temp;
+            ++count[0];
+        }else if(temp %5==1){
+            a2 *= -1;
+            ans[1] += temp * a2;
+            ++count[1];
+        }else if(temp % 5 == 2){
+            ++ans[2];
+            ++count[2];
+        }else if(temp % 5 == 3){
+            ans[3] += temp;
+            ++count[3];
+        }else if(temp % 5 == 4){
+            if(temp > ans[4]){
+                ans[4] = temp;
+                ++count[4];
+            }
+        }else {}
+    }
+
+    for(int i = 0;i < 3;++i){
+        if(count[i] == 0) printf("N ");
+        else printf("%d ",ans[i]);
+    }
+    if(count[3] == 0) printf("N ");
+    else printf("%.1f ",ans[3]*1.0/count[3]);
+    if(count[4] == 0) printf("N");
+    else printf("%d",ans[4]);
+
+    return 0;
+}
+```
 
