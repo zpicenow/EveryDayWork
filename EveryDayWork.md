@@ -3686,3 +3686,133 @@ int main(){
 }
 ```
 
+PAT B1018  
+
+```c
+#include<stdio.h>
+int main(){
+    int n;
+    int hand1[3] = {0};
+    int hand2[3] = {0};
+    int count[3] = {0};
+    char a,b;
+    scanf("%d",&n);
+    for(int i = 0;i < n;++i) {
+        getchar();
+        scanf("%c %c", &a, &b);
+        if (a == b) ++count[1];
+        else {
+            if (a == 'C') {
+                if (b == 'J') {
+                    ++count[0];
+                    ++hand1[0];
+                } else {
+                    ++count[2];
+                    ++hand2[2];
+                }
+            } else if (a == 'J') {
+                if (b == 'B') {
+                    ++count[0];
+                    ++hand1[1];
+                } else {
+                    ++count[2];
+                    ++hand2[0];
+                }
+            } else {
+                if (b == 'C') {
+                    ++count[0];
+                    ++hand1[2];
+                } else {
+                    ++count[2];
+                    ++hand2[1];
+                }
+            }
+        }
+    }
+        printf("%d %d %d\n",count[0],count[1],count[2]);
+        printf("%d %d %d\n",count[2],count[1],count[0]);
+        if(hand1[2] >= hand1[1]&&hand1[2]>= hand1[0]) printf("B ");
+        else if(hand1[0] >= hand1[1]&&hand1[0] >= hand1[2]) printf("C ");
+        else if(hand1[1] >= hand1[0]&&hand1[1]>= hand1[2]) printf("J ");
+        else{}
+        if(hand2[2] >= hand2[1]&&hand2[2]>= hand2[0]) printf("B");
+        else if(hand2[0] >= hand2[1]&&hand2[0] >= hand2[2]) printf("C");
+        else if(hand2[1] >= hand2[0]&&hand2[1]>= hand2[2]) printf("J");
+        else{}
+        return 0;
+
+
+}
+```  
+
+PAT A 1042  
+
+```c
+#include<stdio.h>
+
+int main(){
+    int p[3][55],n;
+    scanf("%d",&n);
+    for(int i = 1;i < 55;++i){
+        p[0][i] = i;
+        scanf("%d",&p[2][i]);
+    }
+    for(int i = 1; i<= n;++i){
+        for(int j = 1;j <= 54;++j){
+            p[i%2][p[2][j]] = p[(i+1)%2][j];
+        }
+    }
+    for(int i = 1;i <= 54;++i){
+        if(p[n%2][i] <= 13){
+            printf("S%d",p[n%2][i]);
+        }else if(p[n%2][i] <= 26){
+            printf("H%d",p[n%2][i]-13);
+        }else if(p[n%2][i] <= 39){
+            printf("C%d",p[n%2][i]-26);
+        }else if(p[n%2][i] <= 52){
+            printf("D%d",p[n%2][i]-39);
+
+        }else{
+            printf("J%d",p[n%2][i]-52);
+        }
+        if(i < 54) printf(" ");
+
+    }
+}
+```  
+
+PAT A 1046  
+
+```c
+#include<stdio.h>
+const int maxn = 100010;
+int d[maxn] = {0},dis[maxn] = {0};
+int main(){
+    int n,m,a,b,total = 0;
+    scanf("%d",&n);
+    for(int i = 1; i <= n;++i){
+        scanf("%d", &d[i]);
+        dis[i] = total;
+        total += d[i];
+    }
+    scanf("%d",&m);
+    for(int i = 0; i < m;++i){
+        int path = 0,tol = total;
+        scanf("%d%d",&a,&b);
+        if(a > b){
+            int temp = a;
+            a = b;
+            b = temp;
+        }
+        path = dis[b] - dis[a];
+        tol -= path;
+        if(path >= tol) printf("%d",tol);
+        else printf("%d",path);
+        if(i < m-1) printf("\n");
+    }
+    return 0;
+}
+```  
+
+注意段错误可能是由于开辟的空间不够，（比如我少数了一个零，开辟的空间少了十倍，找了好久）
+另外题目中这种增加联系的思想很妙，求两个中间长度转化成了两个到起始长度的初始值，求环的另一部分转化成了总和和已知部分的差值。
