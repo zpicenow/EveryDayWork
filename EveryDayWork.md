@@ -3816,3 +3816,33 @@ int main(){
 
 注意段错误可能是由于开辟的空间不够，（比如我少数了一个零，开辟的空间少了十倍，找了好久）
 另外题目中这种增加联系的思想很妙，求两个中间长度转化成了两个到起始长度的初始值，求环的另一部分转化成了总和和已知部分的差值。
+
+
+# 2019年3月1日打卡  
+
+PAT A1065  
+```c
+#include<stdio.h>
+const int maxn = 15;
+int main(){
+  int n;
+  int ans[maxn] = {0};
+  long long a,b,c;
+  scanf("%d",&n);
+  for(int i = 0;i < n;++i){
+    scanf("%lld%lld%lld",&a,&b,&c);
+    if((c - a) < b){
+      ans[i] = 1;
+    }
+  }
+  for(int i = 0;i < n; ++i){
+    printf("Case #%d: ",i+1);
+    if(ans[i]) printf("true");
+    else printf("false");
+    
+    if(i < n-1) printf("\n");
+    
+  }
+  return 0;
+}
+```
