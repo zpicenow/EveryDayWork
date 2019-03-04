@@ -3845,4 +3845,99 @@ int main(){
   }
   return 0;
 }
-```
+```  
+
+# 2019年3月2日打卡  
+
+PAT A1002  
+```c
+#include<stdio.h>
+double arr[1010] = {0};
+int main(){
+    int k, a, count = 0;
+    double b;
+    scanf("%d",&k);
+    for(int i = 0;i < k;++i){
+        scanf("%d %lf",&a,&b);
+        arr[a] = b;
+        ++count;
+    }
+    scanf("%d",&k);
+    for(int i = 0;i < k;++i){
+        scanf("%d %lf",&a,&b);
+        if(arr[a]==0) ++count;
+        arr[a] += b;
+        if(arr[a] == 0) --count;
+    }
+    printf("%d",count);
+    for(int i = 1000; i > -1 ;--i){
+        if(arr[i] != 0){
+
+            if(count != 0) printf(" ");
+            printf("%d %.1lf",i,arr[i]);
+            --count;
+        }
+    }
+    return 0;
+}
+```  
+
+注意浮点数；
+可能存在系数正负抵消的情况，此时项数会减少注意判断；  
+
+PAT A1009  
+
+```c
+#include<stdio.h>
+const int maxn = 2010;
+double arr[maxn] = {};
+double ans[maxn] = {};
+int main(){
+    int k,a,count = 0,re = 0;
+    double b;
+    scanf("%d",&k);
+    for(int i = 0;i < k;++i){
+        scanf("%d%lf",&a,&b);
+        arr[a] = b;
+        count++;
+    }
+    scanf("%d",&k);
+    
+    int temp;
+    for(int i = 0;i < k;++i){
+        scanf("%d%lf",&a,&b);
+        for(int j = 0;j < maxn;++j){
+            temp = count;
+            if(arr[j]!=0){
+                if(ans[j+a] != 0){
+                    
+                }else{
+                    
+                    ++re;
+                }
+                ans[j+a] += arr[j]*b;
+                if(ans[j+a]==0)--re;
+
+
+                --temp;
+            }
+            if(temp == 0) break;
+        }
+    }
+    printf("%d",re);
+    for(int i = maxn;i > -1;--i){
+        if(re == 0) break;
+        else{
+            if(ans[i]!=0){
+                printf(" ");
+                printf("%d %.1lf",i,ans[i]);
+                --re;
+            }
+        }
+    }
+    return 0;
+}
+```  
+
+
+
